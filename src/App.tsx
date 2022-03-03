@@ -16,7 +16,7 @@ interface Day {
   sunrise: string
   sunset: string
   date: Date 
-  day: string
+  day: number
 }
 
 interface FetchResponse {
@@ -40,36 +40,35 @@ class App extends React.Component{
     startWork: "",
     goSleep: "",
     day: {
-      sunrise: "",
-      sunset: "",
+      sunrise: "Thu Mar 03 2022 06:43:37 GMT-0800 (Pacific Standard Time)",
+      sunset: "Thu Mar 03 2022 17:58:43 GMT-0800 (Pacific Standard Time)",
       date: new Date(Date.now()),
-      day: ""
+      day: 4
     },
     totalSun: 0
   }
 
-  calculateOneYear = () => {
-    // for (let i = 0; i < 365; i++) {
-      console.log(this.state.day.date.toISOString().split('T')[0])
-      getSunriseAndSunset()
-      .then((data: FetchResponse) => {
-        this.setState({day: {
-          ...this.state.day,
-          sunrise: new Date(data.sunrise),
-          sunset: new Date(data.sunset),
-          day: this.state.day.date.getDay()
-        }})
-      })
-      .catch(error => console.log(error))
-    // }
-  }
+  // calculateOneYear = () => {
+  //   // for (let i = 0; i < 365; i++) {
+  //     console.log(this.state.day.date.toISOString().split('T')[0])
+  //     getSunriseAndSunset()
+  //     .then((data: FetchResponse) => {
+  //       this.setState({day: {
+  //         ...this.state.day,
+  //         sunrise: new Date(data.sunrise),
+  //         sunset: new Date(data.sunset),
+  //         day: this.state.day.date.getDay()
+  //       }})
+  //     })
+  //     .catch(error => console.log(error))
+  //   // }
+  // }
 
-
-  calculateSuntime = (): void =>  {
+  calculateSuntimeWeekend = (): void =>  {
     const oneMinute: number = 60000
     const minutesOfSun: number = (new Date(this.state.day.sunset).getTime()) - (new Date(this.state.day.sunrise).getTime())
     ///FUNCTION BELOW WORKS, WHY IS TYPESCRIPT MAD?
-    this.setState(prevState => ({totalSun:  prevState.totalSun += minutesOfSun}))
+    this.setState(prevState => ({totalSun:  prevState.totalSun += minutesOfSun / oneMinute}))
   }
 
   grabTime = (type: string, time: string) => {
@@ -91,8 +90,23 @@ class App extends React.Component{
     }
   }
 
+  calculateSuntimeWeekday = (): void => {
+    const oneMinute: number = 60000
+    const sunrise: Date = new Date(this.state.day.sunrise) 
+    const sunset: Date = new Date(this.state.day.sunset)
+    const year: number = sunrise.getFullYear()
+    const month: number = sunrise.getMonth()
+    const day: number = sunrise.getDate()
+    let minutesOfSun = 0;
+    console.log(new Date(year,month,day,parseInt(this.state.wakeUp.slice(0,2)),parseInt(this.state.wakeUp.slice(3,5))))
+    // console.log(new Date(year))
+    // console.log(year, month, day, sunrise, this.state.wakeUp)
+  }
+
   initiateFetch = () => {
-    getSunriseAndSunset()
+    const dateForFetch = this.state.day.date.toISOString().split('T')[0]
+    console.log(dateForFetch)
+    getSunriseAndSunset(dateForFetch)
     .then((data: FetchResponse) => {
       console.log(data)
       this.setState({day: {
@@ -102,7 +116,7 @@ class App extends React.Component{
         day: this.state.day.date.getDay()
       }})
     })
-    .then(() => this.calculateSuntime())
+    .then(() => this.calculateSuntimeWeekend())
     .catch(error => console.log(error))
   }
 
@@ -110,9 +124,13 @@ class App extends React.Component{
     return (
       <div className="App">
         <button onClick={this.initiateFetch}>
-          Get Sunrise and Sunset!
+          How much time Do you have??
+        </button>
+        <button onClick={this.calculateSuntimeWeekday}>
+          console log current function
         </button>
         <Form grabTime={this.grabTime}/>
+        {this.state.totalSun !==0 && <p>You will have {this.state.totalSun / 60} hours of sun to yourself today!</p>}
       </div>
     );
   }
