@@ -9,6 +9,7 @@ interface State {
   startWork: string
   goSleep:string
   day: Day
+  totalSleep: number
 }
 
 interface Day {
@@ -43,12 +44,15 @@ class App extends React.Component{
       sunset: "",
       date: new Date(Date.now()),
       day: ""
-    }
+    },
+    totalSleep: 0
   }
 
 
   calculateSuntime = () => {
-
+    const oneMinute = 60000
+    const minutesOfSun = (new Date(this.state.day.sunset).getTime()) - (new Date(this.state.day.sunrise).getTime())
+    console.log(minutesOfSun / oneMinute / 60)
   }
 
   grabTime = (type: string, time: string) => {
@@ -81,6 +85,7 @@ class App extends React.Component{
         day: this.state.day.date.getDay()
       }})
     })
+    .then(this.calculateSuntime())
   }
 
   render() {
