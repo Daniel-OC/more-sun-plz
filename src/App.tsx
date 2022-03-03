@@ -9,7 +9,7 @@ interface State {
   startWork: string
   goSleep:string
   day: Day
-  totalSleep: number
+  totalSun: number
 }
 
 interface Day {
@@ -45,14 +45,31 @@ class App extends React.Component{
       date: new Date(Date.now()),
       day: ""
     },
-    totalSleep: 0
+    totalSun: 0
+  }
+
+  calculateOneYear = () => {
+    // for (let i = 0; i < 365; i++) {
+      console.log(this.state.day.date.toISOString().split('T')[0])
+      getSunriseAndSunset()
+      .then((data: FetchResponse) => {
+        this.setState({day: {
+          ...this.state.day,
+          sunrise: new Date(data.sunrise),
+          sunset: new Date(data.sunset),
+          day: this.state.day.date.getDay()
+        }})
+      })
+      .catch(error => console.log(error))
+    // }
   }
 
 
-  calculateSuntime = () => {
-    const oneMinute = 60000
-    const minutesOfSun = (new Date(this.state.day.sunset).getTime()) - (new Date(this.state.day.sunrise).getTime())
-    console.log(minutesOfSun / oneMinute / 60)
+  calculateSuntime = (): void =>  {
+    const oneMinute: number = 60000
+    const minutesOfSun: number = (new Date(this.state.day.sunset).getTime()) - (new Date(this.state.day.sunrise).getTime())
+    ///FUNCTION BELOW WORKS, WHY IS TYPESCRIPT MAD?
+    this.setState(prevState => ({totalSun:  prevState.totalSun += minutesOfSun}))
   }
 
   grabTime = (type: string, time: string) => {
@@ -85,7 +102,8 @@ class App extends React.Component{
         day: this.state.day.date.getDay()
       }})
     })
-    .then(this.calculateSuntime())
+    .then(() => this.calculateSuntime())
+    .catch(error => console.log(error))
   }
 
   render() {
