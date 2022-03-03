@@ -8,6 +8,28 @@ interface State {
   endWork: string
   startWork: string
   goSleep:string
+  day: Day
+}
+
+interface Day {
+  sunrise: string
+  sunset: string
+  date: Date 
+  day: string
+}
+
+interface FetchResponse {
+astronomical_twilight_begin: string
+astronomical_twilight_end: string
+civil_twilight_begin: string
+civil_twilight_end: string
+day_length: number
+nautical_twilight_begin: string
+nautical_twilight_end: string
+solar_noon: string
+sunrise: string
+sunset: string
+
 }
 
 class App extends React.Component{
@@ -15,11 +37,21 @@ class App extends React.Component{
     wakeUp: "",
     endWork: "",
     startWork: "",
-    goSleep: ""
+    goSleep: "",
+    day: {
+      sunrise: "",
+      sunset: "",
+      date: new Date(Date.now()),
+      day: ""
+    }
   }
 
 
-  grabValue = (type: string, time: string) => {
+  calculateSuntime = () => {
+
+  }
+
+  grabTime = (type: string, time: string) => {
     switch (type) {
       case "go-sleep-name":
         this.setState({goSleep: time})
@@ -38,13 +70,26 @@ class App extends React.Component{
     }
   }
 
+  initiateFetch = () => {
+    getSunriseAndSunset()
+    .then((data: FetchResponse) => {
+      console.log(data)
+      this.setState({day: {
+        ...this.state.day,
+        sunrise: new Date(data.sunrise),
+        sunset: new Date(data.sunset),
+        day: this.state.day.date.getDay()
+      }})
+    })
+  }
+
   render() {
     return (
       <div className="App">
-        <button onClick={getSunriseAndSunset}>
+        <button onClick={this.initiateFetch}>
           Get Sunrise and Sunset!
         </button>
-        <Form grabValue={this.grabValue}/>
+        <Form grabTime={this.grabTime}/>
       </div>
     );
   }
