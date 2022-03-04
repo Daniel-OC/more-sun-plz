@@ -40,8 +40,8 @@ class App extends React.Component{
     startWork: "",
     goSleep: "",
     day: {
-      sunrise: "Thu Mar 03 2022 06:43:37 GMT-0800 (Pacific Standard Time)",
-      sunset: "Thu Mar 03 2022 17:58:43 GMT-0800 (Pacific Standard Time)",
+      sunrise: "Thu Mar 31 2022 06:43:37 GMT-0800 (Pacific Standard Time)",
+      sunset: "Thu Mar 31 2022 17:58:43 GMT-0800 (Pacific Standard Time)",
       date: new Date(Date.now()),
       day: 4
     },
@@ -98,9 +98,14 @@ class App extends React.Component{
     const month: number = sunrise.getMonth()
     const day: number = sunrise.getDate()
     let minutesOfSun = 0;
-    console.log(new Date(year,month,day,parseInt(this.state.wakeUp.slice(0,2)),parseInt(this.state.wakeUp.slice(3,5))))
-    // console.log(new Date(year))
-    // console.log(year, month, day, sunrise, this.state.wakeUp)
+    const wakeUpTime = new Date(year,month,day,parseInt(this.state.wakeUp.slice(0,2)),parseInt(this.state.wakeUp.slice(3,5)))
+    const startWorkTime = new Date(year,month,day,parseInt(this.state.startWork.slice(0,2)),parseInt(this.state.startWork.slice(3,5)))
+    const endWorkTime = new Date(year,month,day,parseInt(this.state.endWork.slice(0,2)),parseInt(this.state.endWork.slice(3,5)))
+    const goSleepTime = new Date(year,month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1 , parseInt(this.state.goSleep.slice(0,2)),parseInt(this.state.goSleep.slice(3,5)))
+    console.log(wakeUpTime)
+    console.log(startWorkTime)
+    console.log(endWorkTime)
+    console.log(goSleepTime)
   }
 
   initiateFetch = () => {
