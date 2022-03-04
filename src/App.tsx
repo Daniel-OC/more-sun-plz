@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { Props } from 'react';
 import './App.scss';
 import {getSunriseAndSunset} from './apiCall'
 import Form from './Components/Form/Form'
+
+interface Props {}
 
 interface State {
   wakeUp: string
   endWork: string
   startWork: string
   goSleep:string
+  totalSun: any
   day: Day
-  totalSun: number
 }
 
 interface Day {
@@ -33,19 +35,20 @@ sunset: string
 
 }
 
-class App extends React.Component{
+class App extends React.Component<Props, State> {
   state: State = {
     wakeUp: "",
     endWork: "",
     startWork: "",
     goSleep: "",
+    totalSun: 0,
     day: {
       sunrise: "Thu Mar 31 2022 06:43:37 GMT-0800 (Pacific Standard Time)",
       sunset: "Thu Mar 31 2022 17:58:43 GMT-0800 (Pacific Standard Time)",
       date: new Date(Date.now()),
       day: 4
     },
-    totalSun: 0
+    
   }
 
   // calculateOneYear = () => {
@@ -90,22 +93,32 @@ class App extends React.Component{
     }
   }
 
-  calculateSuntimeWeekday = (): void => {
+  calculateSuntimeWeekday(): void {
     const oneMinute: number = 60000
-    const sunrise: Date = new Date(this.state.day.sunrise) 
+    const sunrise: Date = new Date(this.state.day.sunrise)
+    const sunriseTime: number = sunrise.getTime()
     const sunset: Date = new Date(this.state.day.sunset)
+    const sunsetTime: number = sunset.getTime()
     const year: number = sunrise.getFullYear()
     const month: number = sunrise.getMonth()
     const day: number = sunrise.getDate()
     let minutesOfSun = 0;
-    const wakeUpTime = new Date(year,month,day,parseInt(this.state.wakeUp.slice(0,2)),parseInt(this.state.wakeUp.slice(3,5)))
-    const startWorkTime = new Date(year,month,day,parseInt(this.state.startWork.slice(0,2)),parseInt(this.state.startWork.slice(3,5)))
-    const endWorkTime = new Date(year,month,day,parseInt(this.state.endWork.slice(0,2)),parseInt(this.state.endWork.slice(3,5)))
-    const goSleepTime = new Date(year,month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1 , parseInt(this.state.goSleep.slice(0,2)),parseInt(this.state.goSleep.slice(3,5)))
-    console.log(wakeUpTime)
-    console.log(startWorkTime)
-    console.log(endWorkTime)
-    console.log(goSleepTime)
+    const wakeUpTime = new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)), parseInt(this.state.wakeUp.slice(3,5))).getTime()
+    const startWorkTime = new Date(year, month, day, parseInt(this.state.startWork.slice(0,2)), parseInt(this.state.startWork.slice(3,5))).getTime()
+    const endWorkTime = new Date(year, month, parseInt(this.state.endWork.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.endWork.slice(0,2)), parseInt(this.state.endWork.slice(3,5))).getTime()
+    const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))).getTime()
+    if (sunriseTime < wakeUpTime) {
+      minutesOfSun += ((startWorkTime - wakeUpTime) / oneMinute)
+    } else if ( sunriseTime < startWorkTime) {
+      minutesOfSun += ((startWorkTime - sunriseTime)/ oneMinute)
+    }
+    if (goSleepTime < sunsetTime) {
+      minutesOfSun += ((goSleepTime - endWorkTime) / oneMinute)
+    }
+    else if (((endWorkTime < sunsetTime) && (sunsetTime < goSleepTime))) {
+      minutesOfSun += ((sunsetTime - endWorkTime) / 60)
+    }
+    this.setState(prevState => ({totalSun: prevState.totalSun += minutesOfSun}))
   }
 
   initiateFetch = () => {
