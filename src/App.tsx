@@ -15,8 +15,8 @@ interface State {
 }
 
 interface Day {
-  sunrise: string
-  sunset: string
+  sunrise: Date 
+  sunset: Date
   date: Date 
   day: number
 }
@@ -30,8 +30,8 @@ day_length: number
 nautical_twilight_begin: string
 nautical_twilight_end: string
 solar_noon: string
-sunrise: string
-sunset: string
+sunrise: string | null
+sunset: string | null
 
 }
 
@@ -43,8 +43,8 @@ class App extends React.Component<Props, State> {
     goSleep: "23:45",
     totalSun: 0,
     day: {
-      sunrise: "Thu Mar 31 2022 06:43:37 GMT-0800 (Pacific Standard Time)",
-      sunset: "Thu Mar 31 2022 17:58:43 GMT-0800 (Pacific Standard Time)",
+      sunrise: null,
+      sunset: null,
       date: new Date(Date.now()),
       day: 4
     },
@@ -68,6 +68,8 @@ class App extends React.Component<Props, State> {
   // }
 
   calculateSuntimeWeekend = (): void =>  {
+
+    //do logic for if they wake up or go to bed before / after the sun :sobbing face:
     const oneMinute: number = 60000
     const minutesOfSun: number = (new Date(this.state.day.sunset).getTime()) - (new Date(this.state.day.sunrise).getTime())
     ///FUNCTION BELOW WORKS, WHY IS TYPESCRIPT MAD?
@@ -118,40 +120,75 @@ class App extends React.Component<Props, State> {
     const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))).getTime()
     if (sunriseTime < wakeUpTime) {
       minutesOfSun += ((startWorkTime - wakeUpTime) / oneMinute)
-      console.log(((startWorkTime - wakeUpTime) / oneMinute))
+      // console.log(((startWorkTime - wakeUpTime) / oneMinute))
     } else if ( sunriseTime < startWorkTime) {
       minutesOfSun += ((startWorkTime - sunriseTime)/ oneMinute)
-      console.log(((startWorkTime - sunriseTime)/ oneMinute))
+      // console.log(((startWorkTime - sunriseTime)/ oneMinute))
     }
     if (goSleepTime < sunsetTime) {
       minutesOfSun += ((goSleepTime - endWorkTime) / oneMinute)
-      console.log(((goSleepTime - endWorkTime) / oneMinute))
+      // console.log(((goSleepTime - endWorkTime) / oneMinute))
     }
     else if (((endWorkTime < sunsetTime) && (sunsetTime < goSleepTime))) {
       minutesOfSun += ((sunsetTime - endWorkTime) / oneMinute)
-      console.log(((sunsetTime - endWorkTime) / oneMinute))
-      console.log(sunsetTime/oneMinute, endWorkTime/oneMinute)
+      // console.log(((sunsetTime - endWorkTime) / oneMinute))
+      // console.log(sunsetTime/oneMinute, endWorkTime/oneMinute)
     }
-    // this.setState(prevState => ({totalSun: prevState.totalSun += minutesOfSun}))
-    console.log(minutesOfSun / 60)
+    this.setState(prevState => ({totalSun: prevState.totalSun += minutesOfSun }))
+    // console.log(minutesOfSun / 60)
   }
 
-  // initiateFetch = () => {
-  //   const dateForFetch = this.state.day.date.toISOString().split('T')[0]
-  //   console.log(dateForFetch)
-  //   getSunriseAndSunset(dateForFetch)
-  //   .then((data: FetchResponse) => {
-  //     console.log(data)
-  //     this.setState({day: {
-  //       ...this.state.day,
-  //       sunrise: new Date(data.sunrise),
-  //       sunset: new Date(data.sunset),
-  //       day: this.state.day.date.getDay()
-  //     }})
-  //   })
-  //   .then(() => this.calculateSuntimeWeekend())
-  //   .catch(error => console.log(error))
-  // }
+  initiateFetch = () => {
+    const dateForFetch = this.state.day.date.toISOString().split('T')[0]
+    console.log(dateForFetch)
+    getSunriseAndSunset(dateForFetch)
+    .then((data: FetchResponse) => {
+      console.log(data)
+      this.setState({day: {
+        ...this.state.day,
+        sunrise: new Date(data.sunrise),
+        sunset: new Date(data.sunset),
+        day: this.state.day.date.getDay()
+      }})
+    })
+    .then(() => this.calculateSuntimeWeekend())
+    .catch(error => console.log(error))
+  }
+
+  setStateWithFetch = (data: FetchResponse) => {
+      this.setState({day: {
+        ...this.state.day,
+        sunrise: new Date(data.sunrise),
+        sunset: new Date(data.sunset),
+        day: this.state.day.date.getDay()
+      }})
+  }
+
+  findSunlightForYear = () => {
+    let today = new Date(this.state.day.date)
+    for (let i = 0; i < 1 ; i++) {
+      const dateForFetch = today.toISOString().split('T')[0]
+      getSunriseAndSunset(dateForFetch)
+      .then((data: FetchResponse) => {
+        this.setStateWithFetch(data)
+      })
+      .then(() => {
+        if (this.state.day.day === 6 || this.state.day.day === 7) {
+          this.calculateSuntimeWeekend()
+        } else {
+          this.calculateSuntimeWeekday
+        }
+      })
+      .then(() =>{
+        let tomorrow = today
+        console.log("log tomorrow",tomorrow)
+        this.setState({day: {
+          ...this.state.day,
+          date: new Date()
+        }})
+      })
+    }
+  }
 
   render() {
     return (
@@ -159,7 +196,7 @@ class App extends React.Component<Props, State> {
         <button onClick={this.initiateFetch}>
           How much time Do you have??
         </button>
-        <button onClick={this.calculateSuntimeWeekday}>
+        <button onClick={this.findSunlightForYear}>
           console log current function
         </button>
         <Form grabTime={this.grabTime}/>
