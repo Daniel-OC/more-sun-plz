@@ -4,7 +4,7 @@ import React from 'react'
 interface Props {
   title: string,
   class: string,
-  grabValue: (input: string, time: string) => void
+  grabTime: (input: string, time: string) => void
 }
 
 // interface State {
@@ -16,7 +16,7 @@ const TimeInput: React.FC<Props> = (props: Props) => {
   return (
     <section className={`${props.class}-container`}>
        <h2 className={props.class}>{props.title}</h2>
-       <input type="time" id={`${props.class}-id`} name={`${props.class}-name`} onChange={event => props.grabValue(event.target.name, event.target.value)}></input>
+       <input type="time" id={`${props.class}-id`} name={`${props.class}-name`} onChange={event => props.grabTime(event.target.name, event.target.value)}></input>
      </section>
 
   )

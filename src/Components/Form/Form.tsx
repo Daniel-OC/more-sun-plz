@@ -1,7 +1,7 @@
 import TimeInput from "../TimeInput/TimeInput"
 
 interface Props {
-  grabValue: (type: string, time: string) => void
+  grabTime: (type: string, time: string) => void
 }
 
 const Form = (props: Props) => {
@@ -10,7 +10,7 @@ const Form = (props: Props) => {
     return <TimeInput
     title="What time do you go to bed?"
     class="go-sleep"
-    grabValue={props.grabValue}
+    grabTime={props.grabTime}
     />
   }
   
@@ -18,7 +18,7 @@ const Form = (props: Props) => {
     return <TimeInput 
     title="What time do you wake up?"
     class="wake-up"
-    grabValue={props.grabValue}
+    grabTime={props.grabTime}
     />
   }
 
@@ -26,7 +26,7 @@ const Form = (props: Props) => {
     return <TimeInput 
     title="What time do you start work?"
     class="start-work"
-    grabValue={props.grabValue}
+    grabTime={props.grabTime}
     />
   }
 
@@ -34,7 +34,7 @@ const Form = (props: Props) => {
     return <TimeInput
     title="What time does work end?"
     class="end-work"
-    grabValue={props.grabValue}
+    grabTime={props.grabTime}
     />
   }
 
