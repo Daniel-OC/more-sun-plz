@@ -100,8 +100,18 @@ class App extends React.Component<Props, State> {
     const startWorkTime = new Date(year, month, day, parseInt(this.state.startWork.slice(0,2)), parseInt(this.state.startWork.slice(3,5))).getTime()
     const endWorkTime = new Date(year, month, parseInt(this.state.endWork.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.endWork.slice(0,2)), parseInt(this.state.endWork.slice(3,5))).getTime()
     const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))).getTime()
-
-    if ()
+    // Logic of weekend:
+    // looking for all the time that they are awake and it's sunny.
+    // If wakeup is <
+    if (wakeUpTime > sunriseTime && goSleepTime > sunsetTime) {
+      minutesOfSun += ((sunsetTime - wakeUpTime) / oneMinute)
+    } else if (wakeUpTime < sunriseTime && goSleepTime > sunsetTime) {
+      minutesOfSun += ((sunsetTime - wakeUpTime) / oneMinute)
+    } else if (wakeUpTime > sunriseTime && goSleepTime < sunsetTime) {
+      minutesOfSun += ((goSleepTime - wakeUpTime) / oneMinute)
+    } else if (wakeUpTime < sunriseTime && goSleepTime < sunsetTime) {
+      minutesOfSun +=((goSleepTime - sunriseTime) / oneMinute)
+    }
     
     ///FUNCTION BELOW WORKS, WHY IS TYPESCRIPT MAD?
     this.setState(prevState => ({totalSun:  prevState.totalSun += minutesOfSun / oneMinute}))
