@@ -15,8 +15,8 @@ interface State {
 }
 
 interface Day {
-  sunrise: Date 
-  sunset: Date
+  sunrise: string
+  sunset: string
   date: Date 
   day: number
 }
@@ -30,8 +30,8 @@ day_length: number
 nautical_twilight_begin: string
 nautical_twilight_end: string
 solar_noon: string
-sunrise: string | null
-sunset: string | null
+sunrise: string 
+sunset: string 
 
 }
 
@@ -43,37 +43,11 @@ class App extends React.Component<Props, State> {
     goSleep: "23:45",
     totalSun: 0,
     day: {
-      sunrise: null,
-      sunset: null,
+      sunrise: "",
+      sunset: "",
       date: new Date(Date.now()),
       day: 4
     },
-    
-  }
-
-  // calculateOneYear = () => {
-  //   // for (let i = 0; i < 365; i++) {
-  //     console.log(this.state.day.date.toISOString().split('T')[0])
-  //     getSunriseAndSunset()
-  //     .then((data: FetchResponse) => {
-  //       this.setState({day: {
-  //         ...this.state.day,
-  //         sunrise: new Date(data.sunrise),
-  //         sunset: new Date(data.sunset),
-  //         day: this.state.day.date.getDay()
-  //       }})
-  //     })
-  //     .catch(error => console.log(error))
-  //   // }
-  // }
-
-  calculateSuntimeWeekend = (): void =>  {
-
-    //do logic for if they wake up or go to bed before / after the sun :sobbing face:
-    const oneMinute: number = 60000
-    const minutesOfSun: number = (new Date(this.state.day.sunset).getTime()) - (new Date(this.state.day.sunrise).getTime())
-    ///FUNCTION BELOW WORKS, WHY IS TYPESCRIPT MAD?
-    this.setState(prevState => ({totalSun:  prevState.totalSun += minutesOfSun / oneMinute}))
   }
 
   grabTime = (type: string, time: string) => {
@@ -95,10 +69,28 @@ class App extends React.Component<Props, State> {
     }
   }
 
+  determineWdOrWe = () => {
+    if (this.state.day.day === 6 || this.state.day.day === 7) {
+      this.calculateSuntimeWeekend()
+    } else {
+      this.calculateSuntimeWeekday()
+    }
+  }
+
+  calculateSuntimeWeekend = (): void =>  {
+
+    //do logic for if they wake up or go to bed before / after the sun :sobbing face:
+    const oneMinute: number = 60000
+    const minutesOfSun: number = (new Date(this.state.day.sunset).getTime()) - (new Date(this.state.day.sunrise).getTime())
+    ///FUNCTION BELOW WORKS, WHY IS TYPESCRIPT MAD?
+    this.setState(prevState => ({totalSun:  prevState.totalSun += minutesOfSun / oneMinute}))
+  }
+
   calculateSuntimeWeekday = (): void => {
     const oneMinute: number = 60000
-    let sunrise: Date = new Date(this.state.day.sunrise)
-    let sunset: Date = new Date(this.state.day.sunset)
+    console.log(this.state.day.sunrise)
+    let sunrise: Date = new Date (this.state.day.sunrise)
+    let sunset: Date = new Date (this.state.day.sunset)
     //Why are these next two lines necessary? Something about Javascript being a 0 indexed language? Very confused by sunset's tendency to increase it's hour by one.
     sunrise.setHours(sunrise.getHours()-1)
     sunset.setHours(sunset.getHours()-1)
@@ -144,51 +136,62 @@ class App extends React.Component<Props, State> {
     getSunriseAndSunset(dateForFetch)
     .then((data: FetchResponse) => {
       console.log(data)
-      this.setState({day: {
-        ...this.state.day,
-        sunrise: new Date(data.sunrise),
-        sunset: new Date(data.sunset),
-        day: this.state.day.date.getDay()
-      }})
+      this.setStateWithFetch(data)
     })
-    .then(() => this.calculateSuntimeWeekend())
+    // .then(() => this.determineWdOrWe())
     .catch(error => console.log(error))
   }
 
   setStateWithFetch = (data: FetchResponse) => {
       this.setState({day: {
         ...this.state.day,
-        sunrise: new Date(data.sunrise),
-        sunset: new Date(data.sunset),
+        sunrise: data.sunrise,
+        sunset: data.sunset,
         day: this.state.day.date.getDay()
-      }})
+      }}, () => {this.determineWdOrWe()})
   }
 
-  findSunlightForYear = () => {
-    let today = new Date(this.state.day.date)
-    for (let i = 0; i < 1 ; i++) {
-      const dateForFetch = today.toISOString().split('T')[0]
-      getSunriseAndSunset(dateForFetch)
-      .then((data: FetchResponse) => {
-        this.setStateWithFetch(data)
-      })
-      .then(() => {
-        if (this.state.day.day === 6 || this.state.day.day === 7) {
-          this.calculateSuntimeWeekend()
-        } else {
-          this.calculateSuntimeWeekday
-        }
-      })
-      .then(() =>{
-        let tomorrow = today
-        console.log("log tomorrow",tomorrow)
-        this.setState({day: {
-          ...this.state.day,
-          date: new Date()
-        }})
-      })
-    }
-  }
+  // calculateOneYear = () => {
+  //   // for (let i = 0; i < 365; i++) {
+  //     console.log(this.state.day.date.toISOString().split('T')[0])
+  //     getSunriseAndSunset()
+  //     .then((data: FetchResponse) => {
+  //       this.setState({day: {
+  //         ...this.state.day,
+  //         sunrise: new Date(data.sunrise),
+  //         sunset: new Date(data.sunset),
+  //         day: this.state.day.date.getDay()
+  //       }})
+  //     })
+  //     .catch(error => console.log(error))
+  //   // }
+  // }
+
+  // findSunlightForYear = () => {
+  //   let today = new Date(this.state.day.date)
+  //   for (let i = 0; i < 1 ; i++) {
+  //     const dateForFetch = today.toISOString().split('T')[0]
+  //     getSunriseAndSunset(dateForFetch)
+  //     .then((data: FetchResponse) => {
+  //       this.setStateWithFetch(data)
+  //     })
+  //     .then(() => {
+  //       if (this.state.day.day === 6 || this.state.day.day === 7) {
+  //         this.calculateSuntimeWeekend()
+  //       } else {
+  //         this.calculateSuntimeWeekday
+  //       }
+  //     })
+  //     .then(() =>{
+  //       let tomorrow = today
+  //       console.log("log tomorrow",tomorrow)
+  //       this.setState({day: {
+  //         ...this.state.day,
+  //         date: new Date()
+  //       }})
+  //     })
+  //   }
+  // }
 
   render() {
     return (
@@ -196,7 +199,7 @@ class App extends React.Component<Props, State> {
         <button onClick={this.initiateFetch}>
           How much time Do you have??
         </button>
-        <button onClick={this.findSunlightForYear}>
+        <button onClick={this.initiateFetch}>
           console log current function
         </button>
         <Form grabTime={this.grabTime}/>
