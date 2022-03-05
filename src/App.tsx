@@ -78,10 +78,31 @@ class App extends React.Component<Props, State> {
   }
 
   calculateSuntimeWeekend = (): void =>  {
-
-    //do logic for if they wake up or go to bed before / after the sun :sobbing face:
     const oneMinute: number = 60000
-    const minutesOfSun: number = (new Date(this.state.day.sunset).getTime()) - (new Date(this.state.day.sunrise).getTime())
+    let sunrise: Date = new Date (this.state.day.sunrise)
+    let sunset: Date = new Date (this.state.day.sunset)
+    //Why are these next two lines necessary? Something about Javascript being a 0 indexed language? Very confused by sunset's tendency to increase it's hour by one.
+    sunrise.setHours(sunrise.getHours()-1)
+    sunset.setHours(sunset.getHours()-1)
+    const sunriseTime: number = sunrise.getTime()
+    const sunsetTime: number = sunset.getTime()
+    const year: number = sunrise.getFullYear()
+    const month: number = sunrise.getMonth()
+    const day: number = sunrise.getDate()
+    let minutesOfSun = 0;
+    console.log(sunrise)
+    console.log(sunset)
+    console.log(new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)), parseInt(this.state.wakeUp.slice(3,5))))
+    console.log(new Date(year, month, day, parseInt(this.state.startWork.slice(0,2)), parseInt(this.state.startWork.slice(3,5))))
+    console.log(new Date(year, month, parseInt(this.state.endWork.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.endWork.slice(0,2)), parseInt(this.state.endWork.slice(3,5))))
+    console.log(new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))))
+    const wakeUpTime = new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)), parseInt(this.state.wakeUp.slice(3,5))).getTime()
+    const startWorkTime = new Date(year, month, day, parseInt(this.state.startWork.slice(0,2)), parseInt(this.state.startWork.slice(3,5))).getTime()
+    const endWorkTime = new Date(year, month, parseInt(this.state.endWork.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.endWork.slice(0,2)), parseInt(this.state.endWork.slice(3,5))).getTime()
+    const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))).getTime()
+
+    if ()
+    
     ///FUNCTION BELOW WORKS, WHY IS TYPESCRIPT MAD?
     this.setState(prevState => ({totalSun:  prevState.totalSun += minutesOfSun / oneMinute}))
   }
