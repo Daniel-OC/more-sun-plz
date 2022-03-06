@@ -4,6 +4,7 @@ import {getSunriseAndSunset} from './apiCall'
 import Form from './Components/Form/Form'
 import DSTBox from './Components/DSTBox/DSTBox'
 import StandardTimeBox from './Components/StandardTimeBox/StandardTimeBox'
+import { Route } from 'react-router-dom'
 
 interface Props {}
 
@@ -25,8 +26,6 @@ interface Day {
   day: number
   totalSun: number
 }
-
-
 
 interface FetchResponse {
 astronomical_twilight_begin: string
