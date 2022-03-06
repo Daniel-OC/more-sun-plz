@@ -11,7 +11,10 @@ interface State {
   startWork: string
   goSleep:string
   totalSun: any
-  day: Day
+  standardDay: Day
+  dstDay: Day
+  currentTimeDesignation: string
+  currentView: string
 }
 
 interface Day {
@@ -20,6 +23,8 @@ interface Day {
   date: Date 
   day: number
 }
+
+
 
 interface FetchResponse {
 astronomical_twilight_begin: string
@@ -42,12 +47,21 @@ class App extends React.Component<Props, State> {
     startWork: "09:45",
     goSleep: "23:45",
     totalSun: 0,
-    day: {
+    standardDay: {
+      sunrise: "",
+      sunset: "",
+      // date: new Date(10, 4,3,3),
+      date: new Date(Date.now()),
+      day: 4
+    },
+    dstDay: {
       sunrise: "",
       sunset: "",
       date: new Date(Date.now()),
       day: 4
     },
+    currentTimeDesignation: "",
+    currentView: ""
   }
 
   grabTime = (type: string, time: string) => {
@@ -69,7 +83,18 @@ class App extends React.Component<Props, State> {
     }
   }
 
+  checkIfDST = (date: Date): void => {
+    if (((date.getMonth() === 2) && date.getDate() >= 12) ||  ((date.getMonth() === 10) && date.getDate() <= 5) || ((date.getMonth() > 2) && (date.getMonth() < 10))) {
+      this.setState({ currentTimeDesignation: "DST" })
+    }
+    else {
+      this.setState({currentTimeDesignation: "Standard"})
+    }
+  }
+
+
   determineWdOrWe = () => {
+    this.checkIfDST(this.state.day.date)
     if (this.state.day.day === 6 || this.state.day.day === 7) {
       this.calculateSuntimeWeekend()
     } else {
@@ -114,14 +139,14 @@ class App extends React.Component<Props, State> {
     }
     
     ///FUNCTION BELOW WORKS, WHY IS TYPESCRIPT MAD?
-    this.setState(prevState => ({totalSun:  prevState.totalSun += minutesOfSun / oneMinute}))
+    this.setState({totalSun: minutesOfSun})
   }
 
-  calculateSuntimeWeekday = (): void => {
+  calculateSuntimeWeekday = (dayToCalculate: Day): void => {
     const oneMinute: number = 60000
-    console.log(this.state.day.sunrise)
-    let sunrise: Date = new Date (this.state.day.sunrise)
-    let sunset: Date = new Date (this.state.day.sunset)
+    console.log(dayToCalculate.sunrise)
+    let sunrise: Date = new Date (dayToCalculate.sunrise)
+    let sunset: Date = new Date (dayToCalculate.sunset)
     //Why are these next two lines necessary? Something about Javascript being a 0 indexed language? Very confused by sunset's tendency to increase it's hour by one.
     sunrise.setHours(sunrise.getHours()-1)
     sunset.setHours(sunset.getHours()-1)
@@ -157,7 +182,7 @@ class App extends React.Component<Props, State> {
       // console.log(((sunsetTime - endWorkTime) / oneMinute))
       // console.log(sunsetTime/oneMinute, endWorkTime/oneMinute)
     }
-    this.setState(prevState => ({totalSun: prevState.totalSun += minutesOfSun }))
+    this.setState({totalSun: minutesOfSun})
     // console.log(minutesOfSun / 60)
   }
 
@@ -174,11 +199,17 @@ class App extends React.Component<Props, State> {
   }
 
   setStateWithFetch = (data: FetchResponse) => {
-      this.setState({day: {
-        ...this.state.day,
+      this.setState({standardDay: {
+        ...this.state.standardDay,
         sunrise: data.sunrise,
         sunset: data.sunset,
-        day: this.state.day.date.getDay()
+        day: this.state.standardDay.date.getDay()
+      },
+      dstDay: {
+        ...this.state.dstDay,
+        sunrise: data.sunrise,
+        sunset: data.sunset,
+        day:
       }}, () => {this.determineWdOrWe()})
   }
 
@@ -228,13 +259,13 @@ class App extends React.Component<Props, State> {
     return (
       <div className="App">
         <button onClick={this.initiateFetch}>
-          How much time Do you have??
+          Initiate Fetch and Calculate Time
         </button>
-        <button onClick={this.initiateFetch}>
-          console log current function
-        </button>
+        {/* <button onClick={this.checkIfDST(this.state.day.date)}>
+          console log for current function
+        </button> */}
         <Form grabTime={this.grabTime}/>
-        {this.state.totalSun !==0 && <p>You will have {this.state.totalSun / 60} hours of sun to yourself today!</p>}
+        {this.state.totalSun !==0 && <p>You will have {(this.state.totalSun / 60).toFixed(2)} hours of sun to yourself today!</p>}
       </div>
     );
   }
