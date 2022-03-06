@@ -1,7 +1,15 @@
 import TimeInput from "../TimeInput/TimeInput"
+import { Link } from 'react-router-dom'
 
 interface Props {
   grabTime: (type: string, time: string) => void
+  wakeUp: string
+  endWork: string
+  startWork: string
+  goSleep:string
+  initiateFetch: () => void
+  changeView: (change: string) => void
+  currentView: string
 }
 
 const Form = (props: Props) => {
@@ -40,10 +48,18 @@ const Form = (props: Props) => {
 
   return(
     <section className="input-form">
+      <h2>How Does Daylight Savings Affect Me?</h2>
       {goSleep()}
       {wakeUp()}
       {startWork()}
       {endWork()}
+      {props.endWork && props.goSleep && props.startWork && props.wakeUp && <Link to="standard">
+          <button onClick={() => {
+            props.initiateFetch()
+            props.changeView("standard")}}>
+            Submit
+          </button>
+        </Link>}
     </section>
 
   ) 

@@ -16,7 +16,7 @@ interface State {
   standardDay: Day
   dstDay: Day
   currentTimeDesignation: string
-  // currentView: string
+  currentView: string
 }
 
 interface Day {
@@ -42,10 +42,10 @@ sunset: string
 
 class App extends React.Component<Props, State> {
   state: State = {
-    wakeUp: "07:45",
-    endWork: "17:45",
-    startWork: "09:45",
-    goSleep: "23:45",
+    wakeUp: "07:00",
+    endWork: "17:00",
+    startWork: "08:00",
+    goSleep: "23:00",
     standardDay: {
       sunrise: "",
       sunset: "",
@@ -62,7 +62,7 @@ class App extends React.Component<Props, State> {
       totalSun: 0
     },
     currentTimeDesignation: "",
-    // currentView: ""
+    currentView: ""
   }
 
   grabTime = (type: string, time: string) => {
@@ -93,9 +93,9 @@ class App extends React.Component<Props, State> {
     }
   }
 
-  // changeView = (change: string) => {
-  //   this.setState({currentView: change})
-  // }
+  changeView = (change: string) => {
+    this.setState({currentView: change})
+  }
 
   determineWdOrWe = () => {
     this.checkIfDST(this.state.standardDay.date)
@@ -111,6 +111,7 @@ class App extends React.Component<Props, State> {
 
   calculateSuntimeWeekend = (dayToCalculate: Day): void =>  {
     const oneMinute: number = 60000
+    console.log('weekendCalc')
     let sunrise: Date = new Date (dayToCalculate.sunrise)
     let sunset: Date = new Date (dayToCalculate.sunset)
     //Why are these next two lines necessary? Something about Javascript being a 0 indexed language? Very confused by sunset's tendency to increase it's hour by one.
@@ -123,16 +124,20 @@ class App extends React.Component<Props, State> {
     const month: number = sunrise.getMonth()
     const day: number = sunrise.getDate()
     let minutesOfSun = 0;
-    const wakeUpTime = new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)), parseInt(this.state.wakeUp.slice(3,5))).getTime()
-    const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))).getTime()
+    const wakeUpTime = new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)) -1 , (parseInt(this.state.wakeUp.slice(3,5))) -1).getTime()
+    const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)) - 1, (parseInt(this.state.goSleep.slice(3,5))) - 1).getTime()
 
     if (wakeUpTime > sunriseTime && goSleepTime > sunsetTime) {
+      console.log('weekendCalc')
       minutesOfSun += ((sunsetTime - wakeUpTime) / oneMinute)
     } else if (wakeUpTime < sunriseTime && goSleepTime > sunsetTime) {
+      console.log('weekendCalc')
       minutesOfSun += ((sunsetTime - wakeUpTime) / oneMinute)
     } else if (wakeUpTime > sunriseTime && goSleepTime < sunsetTime) {
+      console.log('weekendCalc')
       minutesOfSun += ((goSleepTime - wakeUpTime) / oneMinute)
     } else if (wakeUpTime < sunriseTime && goSleepTime < sunsetTime) {
+      console.log('weekendCalc')
       minutesOfSun += ((goSleepTime - sunriseTime) / oneMinute)
     }
     
@@ -232,14 +237,9 @@ class App extends React.Component<Props, State> {
   render() {
     return (
       <div className="App">
-        <Link to="standard">
-          <button onClick={this.initiateFetch}>
-            Initiate Fetch and Calculate Time
-          </button>
-        </Link>
-        <Route exact path="/" render={() => <Form grabTime={this.grabTime}/>} />
-        <Route path="/dst" render={() => <DSTBox dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
-        <Route path="/standard" render={() => <StandardTimeBox dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
+        <Route exact path="/" render={() => <Form currentView={this.state.currentView} changeView={this.changeView} grabTime={this.grabTime} goSleep={this.state.goSleep} startWork={this.state.startWork} endWork={this.state.endWork} wakeUp={this.state.wakeUp} initiateFetch={this.initiateFetch} />} />
+        <Route path="/dst" render={() => <DSTBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
+        <Route path="/standard" render={() => <StandardTimeBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
       </div>
     );
   }
