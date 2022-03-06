@@ -1,3 +1,5 @@
+import {Link} from 'react-router-dom'
+
 // put this in types so it's accessible multiple places?
 interface Day {
   sunrise: string
@@ -12,7 +14,7 @@ interface Props {
   dstDay: Day
   standardDay: Day
   currentTimeDesignation: string
-  changeView: (change: string) => void
+  // changeView: (change: string) => void
 }
 
 const StandardTimeBox = (props: Props) => {
@@ -32,10 +34,11 @@ const StandardTimeBox = (props: Props) => {
   
   return (
     <section className="DST-box">
+      <Link to="/">Go Home</Link>
       {props.currentTimeDesignation === "DST" && notStandard}
       {props.currentTimeDesignation === "Standard" && yesStandard}
-      <button onClick={() => props.changeView("DST")} >See DST</button>
-      <button onClick={() => props.changeView("Standard")} >See Standard Time</button>
+      <Link to="/standard"><p>Look at Standard Time</p></Link>
+      <Link to="/dst"><p>Look at Daylight Savings Time</p></Link>
     </section>
   )
 }
