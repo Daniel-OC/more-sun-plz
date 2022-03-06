@@ -2,6 +2,7 @@ import React from 'react';
 import './App.scss';
 import {getSunriseAndSunset} from './apiCall'
 import Form from './Components/Form/Form'
+import { doesNotReject } from 'assert';
 
 interface Props {}
 
@@ -10,7 +11,6 @@ interface State {
   endWork: string
   startWork: string
   goSleep:string
-  totalSun: any
   standardDay: Day
   dstDay: Day
   currentTimeDesignation: string
@@ -22,6 +22,7 @@ interface Day {
   sunset: string
   date: Date 
   day: number
+  totalSun: number
 }
 
 
@@ -46,19 +47,20 @@ class App extends React.Component<Props, State> {
     endWork: "17:45",
     startWork: "09:45",
     goSleep: "23:45",
-    totalSun: 0,
     standardDay: {
       sunrise: "",
       sunset: "",
       // date: new Date(10, 4,3,3),
       date: new Date(Date.now()),
-      day: 4
+      day: 4,
+      totalSun: 0
     },
     dstDay: {
       sunrise: "",
       sunset: "",
       date: new Date(Date.now()),
-      day: 4
+      day: 4,
+      totalSun: 0
     },
     currentTimeDesignation: "",
     currentView: ""
@@ -92,21 +94,32 @@ class App extends React.Component<Props, State> {
     }
   }
 
+  adjustDST = () => {
+    // let newSunrise = this.state.dstDay.sunrise
+    // let newSunset = this.state.dstDay.sunset
+    // newSunrise.setHours()
+    // this.setState({sunrise: })
+  }
+
 
   determineWdOrWe = () => {
-    this.checkIfDST(this.state.day.date)
-    if (this.state.day.day === 6 || this.state.day.day === 7) {
-      this.calculateSuntimeWeekend()
+    this.checkIfDST(this.state.standardDay.date)
+    this.adjustDST()
+    if (this.state.standardDay.day === 0 || this.state.standardDay.day === 6) {
+      this.calculateSuntimeWeekend(this.state.standardDay)
+      this.calculateSuntimeWeekend(this.state.dstDay)
     } else {
-      this.calculateSuntimeWeekday()
+      this.calculateSuntimeWeekday(this.state.standardDay)
+      this.calculateSuntimeWeekday(this.state.dstDay)
     }
   }
 
-  calculateSuntimeWeekend = (): void =>  {
+  calculateSuntimeWeekend = (dayToCalculate: Day): void =>  {
     const oneMinute: number = 60000
-    let sunrise: Date = new Date (this.state.day.sunrise)
-    let sunset: Date = new Date (this.state.day.sunset)
+    let sunrise: Date = new Date (dayToCalculate.sunrise)
+    let sunset: Date = new Date (dayToCalculate.sunset)
     //Why are these next two lines necessary? Something about Javascript being a 0 indexed language? Very confused by sunset's tendency to increase it's hour by one.
+    //Seemingly not necessary anymore?! wtf?!
     sunrise.setHours(sunrise.getHours()-1)
     sunset.setHours(sunset.getHours()-1)
     const sunriseTime: number = sunrise.getTime()
@@ -115,19 +128,9 @@ class App extends React.Component<Props, State> {
     const month: number = sunrise.getMonth()
     const day: number = sunrise.getDate()
     let minutesOfSun = 0;
-    console.log(sunrise)
-    console.log(sunset)
-    console.log(new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)), parseInt(this.state.wakeUp.slice(3,5))))
-    console.log(new Date(year, month, day, parseInt(this.state.startWork.slice(0,2)), parseInt(this.state.startWork.slice(3,5))))
-    console.log(new Date(year, month, parseInt(this.state.endWork.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.endWork.slice(0,2)), parseInt(this.state.endWork.slice(3,5))))
-    console.log(new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))))
     const wakeUpTime = new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)), parseInt(this.state.wakeUp.slice(3,5))).getTime()
-    const startWorkTime = new Date(year, month, day, parseInt(this.state.startWork.slice(0,2)), parseInt(this.state.startWork.slice(3,5))).getTime()
-    const endWorkTime = new Date(year, month, parseInt(this.state.endWork.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.endWork.slice(0,2)), parseInt(this.state.endWork.slice(3,5))).getTime()
     const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))).getTime()
-    // Logic of weekend:
-    // looking for all the time that they are awake and it's sunny.
-    // If wakeup is <
+
     if (wakeUpTime > sunriseTime && goSleepTime > sunsetTime) {
       minutesOfSun += ((sunsetTime - wakeUpTime) / oneMinute)
     } else if (wakeUpTime < sunriseTime && goSleepTime > sunsetTime) {
@@ -135,11 +138,23 @@ class App extends React.Component<Props, State> {
     } else if (wakeUpTime > sunriseTime && goSleepTime < sunsetTime) {
       minutesOfSun += ((goSleepTime - wakeUpTime) / oneMinute)
     } else if (wakeUpTime < sunriseTime && goSleepTime < sunsetTime) {
-      minutesOfSun +=((goSleepTime - sunriseTime) / oneMinute)
+      minutesOfSun += ((goSleepTime - sunriseTime) / oneMinute)
     }
     
     ///FUNCTION BELOW WORKS, WHY IS TYPESCRIPT MAD?
-    this.setState({totalSun: minutesOfSun})
+    if (dayToCalculate === this.state.standardDay) {
+      console.log('just checking')
+      this.setState({standardDay: {
+        ...this.state.standardDay,
+        totalSun: minutesOfSun
+      }})
+    } else {
+      console.log('just checking')
+      this.setState({dstDay: {
+        ...this.state.dstDay,
+        totalSun: minutesOfSun
+      }})
+    }
   }
 
   calculateSuntimeWeekday = (dayToCalculate: Day): void => {
@@ -156,42 +171,39 @@ class App extends React.Component<Props, State> {
     const month: number = sunrise.getMonth()
     const day: number = sunrise.getDate()
     let minutesOfSun = 0;
-    console.log(sunrise)
-    console.log(sunset)
-    console.log(new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)), parseInt(this.state.wakeUp.slice(3,5))))
-    console.log(new Date(year, month, day, parseInt(this.state.startWork.slice(0,2)), parseInt(this.state.startWork.slice(3,5))))
-    console.log(new Date(year, month, parseInt(this.state.endWork.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.endWork.slice(0,2)), parseInt(this.state.endWork.slice(3,5))))
-    console.log(new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))))
     const wakeUpTime = new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)), parseInt(this.state.wakeUp.slice(3,5))).getTime()
     const startWorkTime = new Date(year, month, day, parseInt(this.state.startWork.slice(0,2)), parseInt(this.state.startWork.slice(3,5))).getTime()
     const endWorkTime = new Date(year, month, parseInt(this.state.endWork.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.endWork.slice(0,2)), parseInt(this.state.endWork.slice(3,5))).getTime()
     const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))).getTime()
+    
     if (sunriseTime < wakeUpTime) {
       minutesOfSun += ((startWorkTime - wakeUpTime) / oneMinute)
-      // console.log(((startWorkTime - wakeUpTime) / oneMinute))
     } else if ( sunriseTime < startWorkTime) {
       minutesOfSun += ((startWorkTime - sunriseTime)/ oneMinute)
-      // console.log(((startWorkTime - sunriseTime)/ oneMinute))
     }
     if (goSleepTime < sunsetTime) {
       minutesOfSun += ((goSleepTime - endWorkTime) / oneMinute)
-      // console.log(((goSleepTime - endWorkTime) / oneMinute))
     }
     else if (((endWorkTime < sunsetTime) && (sunsetTime < goSleepTime))) {
       minutesOfSun += ((sunsetTime - endWorkTime) / oneMinute)
-      // console.log(((sunsetTime - endWorkTime) / oneMinute))
-      // console.log(sunsetTime/oneMinute, endWorkTime/oneMinute)
     }
-    this.setState({totalSun: minutesOfSun})
-    // console.log(minutesOfSun / 60)
+    if (dayToCalculate === this.state.standardDay) {
+      this.setState({standardDay: {
+        ...this.state.standardDay,
+        totalSun: minutesOfSun
+      }})
+    } else {
+      this.setState({dstDay: {
+        ...this.state.dstDay,
+        totalSun: minutesOfSun
+      }})
+    }
   }
 
   initiateFetch = () => {
-    const dateForFetch = this.state.day.date.toISOString().split('T')[0]
-    console.log(dateForFetch)
+    const dateForFetch = this.state.standardDay.date.toISOString().split('T')[0]
     getSunriseAndSunset(dateForFetch)
     .then((data: FetchResponse) => {
-      console.log(data)
       this.setStateWithFetch(data)
     })
     // .then(() => this.determineWdOrWe())
@@ -199,6 +211,10 @@ class App extends React.Component<Props, State> {
   }
 
   setStateWithFetch = (data: FetchResponse) => {
+    let dstSunrise = new Date(data.sunrise)
+    let dstSunset = new Date(data.sunset)
+    dstSunrise.setHours(dstSunrise.getHours() + 1)
+    dstSunset.setHours(dstSunset.getHours() + 1)
       this.setState({standardDay: {
         ...this.state.standardDay,
         sunrise: data.sunrise,
@@ -207,9 +223,9 @@ class App extends React.Component<Props, State> {
       },
       dstDay: {
         ...this.state.dstDay,
-        sunrise: data.sunrise,
-        sunset: data.sunset,
-        day:
+        sunrise: dstSunrise.toString(),
+        sunset: dstSunset.toString(),
+        day: this.state.dstDay.date.getDay()
       }}, () => {this.determineWdOrWe()})
   }
 
@@ -265,7 +281,7 @@ class App extends React.Component<Props, State> {
           console log for current function
         </button> */}
         <Form grabTime={this.grabTime}/>
-        {this.state.totalSun !==0 && <p>You will have {(this.state.totalSun / 60).toFixed(2)} hours of sun to yourself today!</p>}
+        {/* {this.state.totalSun !==0 && <p>You will have {(this.state.totalSun / 60).toFixed(2)} hours of sun to yourself today!</p>} */}
       </div>
     );
   }
