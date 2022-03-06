@@ -14,13 +14,14 @@ interface Props {
   dstDay: Day
   standardDay: Day
   currentTimeDesignation: string
-  // changeView: (change: string) => void
+  changeView: (change: string) => void
+  currentView: string
 }
 
 const DSTBox = (props: Props) => {
   const notDST = 
     <section>
-      <h2>It is currently Standard Time. If we made it Daylight Savings Time year round it would currently be {props.dstDay.date.toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit'})}.</h2>
+      <h2>It is currently {props.standardDay.date.toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit'})} Standard Time. If we made it Daylight Savings Time year round it would currently be {props.dstDay.date.toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit'})}.</h2>
       <p>The sun would have risen at {new Date(props.dstDay.sunrise).toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit'})} and set at {new Date(props.dstDay.sunset).toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit'})}</p>
       <p>You would have gotten {(props.dstDay.totalSun / 60).toFixed(2)} hours of sunlight today.</p>
     </section> 
@@ -34,10 +35,11 @@ const DSTBox = (props: Props) => {
   
   return (
     <section className="DST-box">
+      <Link to="/">Go Home</Link>
       {props.currentTimeDesignation === "DST" && yesDST}
       {props.currentTimeDesignation === "Standard" && notDST}
-      <Link to="/standard"><p>Look at Standard Time</p></Link>
-      <Link to="/dst"><p>Look at Daylight Savings Time</p></Link>
+      {props.currentView === "dst" && <Link to="/standard" onClick={() => props.changeView("standard")}><p>Compare to Standard Time</p></Link>}
+      {props.currentView === "standard" && <Link to="/dst" onClick={() => props.changeView("dst")}><p>Compare to Daylight Savings Time</p></Link>}
     </section>
   )
 }
