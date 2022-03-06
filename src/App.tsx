@@ -2,7 +2,8 @@ import React from 'react';
 import './App.scss';
 import {getSunriseAndSunset} from './apiCall'
 import Form from './Components/Form/Form'
-import { doesNotReject } from 'assert';
+import DSTBox from './Components/DSTBox/DSTBox'
+import StandardTimeBox from './Components/StandardTimeBox/StandardTimeBox'
 
 interface Props {}
 
@@ -38,7 +39,6 @@ nautical_twilight_end: string
 solar_noon: string
 sunrise: string 
 sunset: string 
-
 }
 
 class App extends React.Component<Props, State> {
@@ -94,17 +94,13 @@ class App extends React.Component<Props, State> {
     }
   }
 
-  adjustDST = () => {
-    // let newSunrise = this.state.dstDay.sunrise
-    // let newSunset = this.state.dstDay.sunset
-    // newSunrise.setHours()
-    // this.setState({sunrise: })
+  changeView = (change: string) => {
+    this.setState({currentView: change})
   }
-
 
   determineWdOrWe = () => {
     this.checkIfDST(this.state.standardDay.date)
-    this.adjustDST()
+    this.changeView("Standard")
     if (this.state.standardDay.day === 0 || this.state.standardDay.day === 6) {
       this.calculateSuntimeWeekend(this.state.standardDay)
       this.calculateSuntimeWeekend(this.state.dstDay)
@@ -213,63 +209,26 @@ class App extends React.Component<Props, State> {
   setStateWithFetch = (data: FetchResponse) => {
     let dstSunrise = new Date(data.sunrise)
     let dstSunset = new Date(data.sunset)
+    let dstTime = new Date(Date.now())
+    let standardTime = new Date(Date.now())
+    dstTime.setHours(dstTime.getHours() +1)
     dstSunrise.setHours(dstSunrise.getHours() + 1)
     dstSunset.setHours(dstSunset.getHours() + 1)
       this.setState({standardDay: {
         ...this.state.standardDay,
+        date: standardTime,
         sunrise: data.sunrise,
         sunset: data.sunset,
         day: this.state.standardDay.date.getDay()
       },
       dstDay: {
         ...this.state.dstDay,
+        date: dstTime,
         sunrise: dstSunrise.toISOString(),
         sunset: dstSunset.toISOString(),
         day: this.state.dstDay.date.getDay()
       }}, () => {this.determineWdOrWe()})
   }
-
-  // calculateOneYear = () => {
-  //   // for (let i = 0; i < 365; i++) {
-  //     console.log(this.state.day.date.toISOString().split('T')[0])
-  //     getSunriseAndSunset()
-  //     .then((data: FetchResponse) => {
-  //       this.setState({day: {
-  //         ...this.state.day,
-  //         sunrise: new Date(data.sunrise),
-  //         sunset: new Date(data.sunset),
-  //         day: this.state.day.date.getDay()
-  //       }})
-  //     })
-  //     .catch(error => console.log(error))
-  //   // }
-  // }
-
-  // findSunlightForYear = () => {
-  //   let today = new Date(this.state.day.date)
-  //   for (let i = 0; i < 1 ; i++) {
-  //     const dateForFetch = today.toISOString().split('T')[0]
-  //     getSunriseAndSunset(dateForFetch)
-  //     .then((data: FetchResponse) => {
-  //       this.setStateWithFetch(data)
-  //     })
-  //     .then(() => {
-  //       if (this.state.day.day === 6 || this.state.day.day === 7) {
-  //         this.calculateSuntimeWeekend()
-  //       } else {
-  //         this.calculateSuntimeWeekday
-  //       }
-  //     })
-  //     .then(() =>{
-  //       let tomorrow = today
-  //       console.log("log tomorrow",tomorrow)
-  //       this.setState({day: {
-  //         ...this.state.day,
-  //         date: new Date()
-  //       }})
-  //     })
-  //   }
-  // }
 
   render() {
     return (
@@ -277,11 +236,9 @@ class App extends React.Component<Props, State> {
         <button onClick={this.initiateFetch}>
           Initiate Fetch and Calculate Time
         </button>
-        {/* <button onClick={this.checkIfDST(this.state.day.date)}>
-          console log for current function
-        </button> */}
-        <Form grabTime={this.grabTime}/>
-        {/* {this.state.totalSun !==0 && <p>You will have {(this.state.totalSun / 60).toFixed(2)} hours of sun to yourself today!</p>} */}
+        {this.state.currentView === "" && <Form grabTime={this.grabTime}/>}
+        {this.state.currentView === "DST" && <DSTBox changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}
+        {this.state.currentView === "Standard" && <StandardTimeBox changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}
       </div>
     );
   }
