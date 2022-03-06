@@ -4,6 +4,7 @@ import {getSunriseAndSunset} from './apiCall'
 import Form from './Components/Form/Form'
 import DSTBox from './Components/DSTBox/DSTBox'
 import StandardTimeBox from './Components/StandardTimeBox/StandardTimeBox'
+import { Route, Link } from 'react-router-dom'
 
 interface Props {}
 
@@ -15,7 +16,7 @@ interface State {
   standardDay: Day
   dstDay: Day
   currentTimeDesignation: string
-  currentView: string
+  // currentView: string
 }
 
 interface Day {
@@ -25,8 +26,6 @@ interface Day {
   day: number
   totalSun: number
 }
-
-
 
 interface FetchResponse {
 astronomical_twilight_begin: string
@@ -63,7 +62,7 @@ class App extends React.Component<Props, State> {
       totalSun: 0
     },
     currentTimeDesignation: "",
-    currentView: ""
+    // currentView: ""
   }
 
   grabTime = (type: string, time: string) => {
@@ -94,13 +93,13 @@ class App extends React.Component<Props, State> {
     }
   }
 
-  changeView = (change: string) => {
-    this.setState({currentView: change})
-  }
+  // changeView = (change: string) => {
+  //   this.setState({currentView: change})
+  // }
 
   determineWdOrWe = () => {
     this.checkIfDST(this.state.standardDay.date)
-    this.changeView("Standard")
+    // this.changeView("Standard")
     if (this.state.standardDay.day === 0 || this.state.standardDay.day === 6) {
       this.calculateSuntimeWeekend(this.state.standardDay)
       this.calculateSuntimeWeekend(this.state.dstDay)
@@ -233,12 +232,14 @@ class App extends React.Component<Props, State> {
   render() {
     return (
       <div className="App">
-        <button onClick={this.initiateFetch}>
-          Initiate Fetch and Calculate Time
-        </button>
-        {this.state.currentView === "" && <Form grabTime={this.grabTime}/>}
-        {this.state.currentView === "DST" && <DSTBox changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}
-        {this.state.currentView === "Standard" && <StandardTimeBox changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}
+        <Link to="standard">
+          <button onClick={this.initiateFetch}>
+            Initiate Fetch and Calculate Time
+          </button>
+        </Link>
+        <Route exact path="/" render={() => <Form grabTime={this.grabTime}/>} />
+        <Route path="/dst" render={() => <DSTBox dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
+        <Route path="/standard" render={() => <StandardTimeBox dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
       </div>
     );
   }
