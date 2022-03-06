@@ -63,7 +63,7 @@ class App extends React.Component<Props, State> {
       totalSun: 0
     },
     currentTimeDesignation: "",
-    currentView: ""
+    currentView: "Standard"
   }
 
   grabTime = (type: string, time: string) => {
@@ -94,17 +94,8 @@ class App extends React.Component<Props, State> {
     }
   }
 
-  adjustDST = () => {
-    // let newSunrise = this.state.dstDay.sunrise
-    // let newSunset = this.state.dstDay.sunset
-    // newSunrise.setHours()
-    // this.setState({sunrise: })
-  }
-
-
   determineWdOrWe = () => {
     this.checkIfDST(this.state.standardDay.date)
-    this.adjustDST()
     if (this.state.standardDay.day === 0 || this.state.standardDay.day === 6) {
       this.calculateSuntimeWeekend(this.state.standardDay)
       this.calculateSuntimeWeekend(this.state.dstDay)
@@ -228,48 +219,6 @@ class App extends React.Component<Props, State> {
         day: this.state.dstDay.date.getDay()
       }}, () => {this.determineWdOrWe()})
   }
-
-  // calculateOneYear = () => {
-  //   // for (let i = 0; i < 365; i++) {
-  //     console.log(this.state.day.date.toISOString().split('T')[0])
-  //     getSunriseAndSunset()
-  //     .then((data: FetchResponse) => {
-  //       this.setState({day: {
-  //         ...this.state.day,
-  //         sunrise: new Date(data.sunrise),
-  //         sunset: new Date(data.sunset),
-  //         day: this.state.day.date.getDay()
-  //       }})
-  //     })
-  //     .catch(error => console.log(error))
-  //   // }
-  // }
-
-  // findSunlightForYear = () => {
-  //   let today = new Date(this.state.day.date)
-  //   for (let i = 0; i < 1 ; i++) {
-  //     const dateForFetch = today.toISOString().split('T')[0]
-  //     getSunriseAndSunset(dateForFetch)
-  //     .then((data: FetchResponse) => {
-  //       this.setStateWithFetch(data)
-  //     })
-  //     .then(() => {
-  //       if (this.state.day.day === 6 || this.state.day.day === 7) {
-  //         this.calculateSuntimeWeekend()
-  //       } else {
-  //         this.calculateSuntimeWeekday
-  //       }
-  //     })
-  //     .then(() =>{
-  //       let tomorrow = today
-  //       console.log("log tomorrow",tomorrow)
-  //       this.setState({day: {
-  //         ...this.state.day,
-  //         date: new Date()
-  //       }})
-  //     })
-  //   }
-  // }
 
   render() {
     return (
