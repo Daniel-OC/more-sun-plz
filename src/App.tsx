@@ -237,8 +237,8 @@ class App extends React.Component<Props, State> {
           Initiate Fetch and Calculate Time
         </button>
         {this.state.currentView === "" && <Form grabTime={this.grabTime}/>}
-        {this.state.currentView === "DST" && <DSTBox dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}
-        {this.state.currentView === "Standard" && <StandardTimeBox dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}
+        {this.state.currentView === "DST" && <DSTBox changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}
+        {this.state.currentView === "Standard" && <StandardTimeBox changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}
       </div>
     );
   }
