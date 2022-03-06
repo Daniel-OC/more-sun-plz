@@ -7,9 +7,6 @@ interface Props {
   grabTime: (input: string, time: string) => void
 }
 
-// interface State {
-//   value: string
-// }
 
 const TimeInput: React.FC<Props> = (props: Props) => {
 
@@ -21,27 +18,5 @@ const TimeInput: React.FC<Props> = (props: Props) => {
 
   )
 }
-
-
-// class TimeInput extends React.Component<Props, State> {
-//   state: State = {
-//     value: ""
-//   }
-
-//   ///LONG TERM NEED TO TYPE THIS APPROPRIATELY
-//   handleChange = (event: any) => {
-//     setState({value: event.target.value})
-
-//   }
- 
-//   render() {
-//     return (
-//     <section className={`${props.class}-container`}>
-//       <h2 className={props.class}>{props.title}</h2>
-//       <input type="time" id={`${props.class}-id`} name={`${props.class}-name`} onChange={event => handleChange(event)}></input>
-//     </section>
-//     )
-//   }
-// }
 
 export default TimeInput;
