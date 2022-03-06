@@ -223,8 +223,8 @@ class App extends React.Component<Props, State> {
       },
       dstDay: {
         ...this.state.dstDay,
-        sunrise: dstSunrise.toString(),
-        sunset: dstSunset.toString(),
+        sunrise: dstSunrise.toISOString(),
+        sunset: dstSunset.toISOString(),
         day: this.state.dstDay.date.getDay()
       }}, () => {this.determineWdOrWe()})
   }
