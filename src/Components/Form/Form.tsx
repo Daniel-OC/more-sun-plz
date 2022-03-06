@@ -44,7 +44,6 @@ const Form = (props: Props) => {
       {wakeUp()}
       {startWork()}
       {endWork()}
-      <button>Submit!</button>
     </section>
 
   ) 
