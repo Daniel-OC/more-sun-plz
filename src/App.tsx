@@ -42,10 +42,10 @@ sunset: string
 
 class App extends React.Component<Props, State> {
   state: State = {
-    wakeUp: "07:00",
-    endWork: "17:00",
-    startWork: "08:00",
-    goSleep: "23:00",
+    wakeUp: "",
+    endWork: "",
+    startWork: "",
+    goSleep: "",
     standardDay: {
       sunrise: "",
       sunset: "",

@@ -54,9 +54,10 @@ const Form = (props: Props) => {
       {startWork()}
       {endWork()}
       {props.endWork && props.goSleep && props.startWork && props.wakeUp && <Link to="standard">
-          <button onClick={() => {
+          <button className="submit-hours"
+          onClick={() => {
             props.initiateFetch()
-            props.changeView("standard")}}>
+            props.changeView("standard")}} >
             Submit
           </button>
         </Link>}
