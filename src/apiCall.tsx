@@ -16,5 +16,4 @@ const getSunriseAndSunset = (date: string) => {
   .then(data => data.results)
 }
 
-
 export {getSunriseAndSunset};
