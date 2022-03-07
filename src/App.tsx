@@ -4,7 +4,7 @@ import {getSunriseAndSunset} from './apiCall'
 import Form from './Components/Form/Form'
 import DSTBox from './Components/DSTBox/DSTBox'
 import StandardTimeBox from './Components/StandardTimeBox/StandardTimeBox'
-import { Route, Link, Switch } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 import Error from './Components/Error/Error'
 
 interface Props {}
@@ -42,57 +42,65 @@ sunrise: string
 sunset: string 
 }
 
+interface TimeObject{
+  sunriseTime: number,
+  sunsetTime: number,
+  wakeUpTime: number,
+  startWorkTime: number,
+  endWorkTime: number,
+  goSleepTime: number
+}
+
 class App extends React.Component<Props, State> {
   state: State = {
-    wakeUp: "",
-    endWork: "",
-    startWork: "",
-    goSleep: "",
+    wakeUp: '',
+    endWork: '',
+    startWork: '',
+    goSleep: '',
     standardDay: {
-      sunrise: "",
-      sunset: "",
-      // date: new Date(10, 4,3,3),
+      sunrise: '',
+      sunset: '',
       date: new Date(Date.now()),
       day: 4,
       totalSun: 0
     },
     dstDay: {
-      sunrise: "",
-      sunset: "",
+      sunrise: '',
+      sunset: '',
       date: new Date(Date.now()),
       day: 4,
       totalSun: 0
     },
-    currentTimeDesignation: "",
-    currentView: "",
+    currentTimeDesignation: '',
+    currentView: '',
     error: ''
   }
 
   grabTime = (type: string, time: string) => {
     switch (type) {
-      case "go-sleep-name":
+      case 'go-sleep-name':
         this.setState({goSleep: time})
         break;
     
-      case "wake-up-name":
+      case 'wake-up-name':
         this.setState({wakeUp: time})
         break;
 
-      case "start-work-name":
+      case 'start-work-name':
         this.setState({startWork: time})
         break;
 
-        case "end-work-name":
+        case 'end-work-name':
           this.setState({endWork: time})
     }
   }
 
   checkIfDST = (date: Date): void => {
     if (((date.getMonth() === 2) && date.getDate() >= 12) ||  ((date.getMonth() === 10) && date.getDate() <= 5) || ((date.getMonth() > 2) && (date.getMonth() < 10))) {
-      this.setState({ currentTimeDesignation: "DST" })
+      this.setState({ currentTimeDesignation: 'DST' })
     }
     else {
-      this.setState({currentTimeDesignation: "Standard"})
+      this.setState({currentTimeDesignation: 'Standard'})
     }
   }
 
@@ -102,7 +110,6 @@ class App extends React.Component<Props, State> {
 
   determineWdOrWe = () => {
     this.checkIfDST(this.state.standardDay.date)
-    // this.changeView("Standard")
     if (this.state.standardDay.day === 0 || this.state.standardDay.day === 6) {
       this.calculateSuntimeWeekend(this.state.standardDay)
       this.calculateSuntimeWeekend(this.state.dstDay)
@@ -112,45 +119,53 @@ class App extends React.Component<Props, State> {
     }
   }
 
-  calculateSuntimeWeekend = (dayToCalculate: Day): void =>  {
-    const oneMinute: number = 60000
-    console.log('weekendCalc')
+  createTimeObjects = (dayToCalculate: Day): TimeObject => {
     let sunrise: Date = new Date (dayToCalculate.sunrise)
     let sunset: Date = new Date (dayToCalculate.sunset)
     sunrise.setHours(sunrise.getHours()-1)
     sunset.setHours(sunset.getHours()-1)
-    const sunriseTime: number = sunrise.getTime()
-    const sunsetTime: number = sunset.getTime()
     const year: number = sunrise.getFullYear()
     const month: number = sunrise.getMonth()
     const day: number = sunrise.getDate()
-    let minutesOfSun = 0;
-    const wakeUpTime = new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)) -1 , (parseInt(this.state.wakeUp.slice(3,5))) -1).getTime()
-    const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)) - 1, (parseInt(this.state.goSleep.slice(3,5))) - 1).getTime()
-
-    if (wakeUpTime > sunriseTime && goSleepTime > sunsetTime) {
-      console.log('weekendCalc')
-      minutesOfSun += ((sunsetTime - wakeUpTime) / oneMinute)
-    } else if (wakeUpTime < sunriseTime && goSleepTime > sunsetTime) {
-      console.log('weekendCalc')
-      minutesOfSun += ((sunsetTime - wakeUpTime) / oneMinute)
-    } else if (wakeUpTime > sunriseTime && goSleepTime < sunsetTime) {
-      console.log('weekendCalc')
-      minutesOfSun += ((goSleepTime - wakeUpTime) / oneMinute)
-    } else if (wakeUpTime < sunriseTime && goSleepTime < sunsetTime) {
-      console.log('weekendCalc')
-      minutesOfSun += ((goSleepTime - sunriseTime) / oneMinute)
+    const sunriseTime: number = sunrise.getTime()
+    const sunsetTime: number = sunset.getTime()
+    const wakeUpTime = new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)), parseInt(this.state.wakeUp.slice(3,5))).getTime()
+    const startWorkTime = new Date(year, month, day, parseInt(this.state.startWork.slice(0,2)), parseInt(this.state.startWork.slice(3,5))).getTime()
+    const endWorkTime = new Date(year, month, parseInt(this.state.endWork.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.endWork.slice(0,2)), parseInt(this.state.endWork.slice(3,5))).getTime()
+    const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))).getTime()
+    let timeObjects = {
+      sunriseTime: sunriseTime,
+      sunsetTime: sunsetTime,
+      wakeUpTime: wakeUpTime,
+      startWorkTime: startWorkTime,
+      endWorkTime: endWorkTime,
+      goSleepTime: goSleepTime
     }
     
-    ///FUNCTION BELOW WORKS, WHY IS TYPESCRIPT MAD?
+    return timeObjects
+  }
+
+  calculateSuntimeWeekend = (dayToCalculate: Day): void =>  {
+    const allTimes = this.createTimeObjects(dayToCalculate)
+    const oneMinute: number = 60000
+    let minutesOfSun = 0;
+    
+    if (allTimes.wakeUpTime > allTimes.sunriseTime && allTimes.goSleepTime > allTimes.sunsetTime) {
+      minutesOfSun += ((allTimes.sunsetTime - allTimes.wakeUpTime) / oneMinute)
+    } else if (allTimes.wakeUpTime < allTimes.sunriseTime && allTimes.goSleepTime > allTimes.sunsetTime) {
+      minutesOfSun += ((allTimes.sunsetTime - allTimes.wakeUpTime) / oneMinute)
+    } else if (allTimes.wakeUpTime > allTimes.sunriseTime && allTimes.goSleepTime < allTimes.sunsetTime) {
+      minutesOfSun += ((allTimes.goSleepTime - allTimes.wakeUpTime) / oneMinute)
+    } else if (allTimes.wakeUpTime < allTimes.sunriseTime && allTimes.goSleepTime < allTimes.sunsetTime) {
+      minutesOfSun += ((allTimes.goSleepTime - allTimes.sunriseTime) / oneMinute)
+    }
+    
     if (dayToCalculate === this.state.standardDay) {
-      console.log('just checking')
       this.setState({standardDay: {
         ...this.state.standardDay,
         totalSun: minutesOfSun
       }})
     } else {
-      console.log('just checking')
       this.setState({dstDay: {
         ...this.state.dstDay,
         totalSun: minutesOfSun
@@ -159,33 +174,20 @@ class App extends React.Component<Props, State> {
   }
 
   calculateSuntimeWeekday = (dayToCalculate: Day): void => {
+    const allTimes = this.createTimeObjects(dayToCalculate)
     const oneMinute: number = 60000
-    console.log(dayToCalculate.sunrise)
-    let sunrise: Date = new Date (dayToCalculate.sunrise)
-    let sunset: Date = new Date (dayToCalculate.sunset)
-    sunrise.setHours(sunrise.getHours()-1)
-    sunset.setHours(sunset.getHours()-1)
-    const sunriseTime: number = sunrise.getTime()
-    const sunsetTime: number = sunset.getTime()
-    const year: number = sunrise.getFullYear()
-    const month: number = sunrise.getMonth()
-    const day: number = sunrise.getDate()
     let minutesOfSun = 0;
-    const wakeUpTime = new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)), parseInt(this.state.wakeUp.slice(3,5))).getTime()
-    const startWorkTime = new Date(year, month, day, parseInt(this.state.startWork.slice(0,2)), parseInt(this.state.startWork.slice(3,5))).getTime()
-    const endWorkTime = new Date(year, month, parseInt(this.state.endWork.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.endWork.slice(0,2)), parseInt(this.state.endWork.slice(3,5))).getTime()
-    const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))).getTime()
     
-    if (sunriseTime < wakeUpTime) {
-      minutesOfSun += ((startWorkTime - wakeUpTime) / oneMinute)
-    } else if ( sunriseTime < startWorkTime) {
-      minutesOfSun += ((startWorkTime - sunriseTime)/ oneMinute)
+    if (allTimes.sunriseTime < allTimes.wakeUpTime) {
+      minutesOfSun += ((allTimes.startWorkTime - allTimes.wakeUpTime) / oneMinute)
+    } else if ( allTimes.sunriseTime < allTimes.startWorkTime) {
+      minutesOfSun += ((allTimes.startWorkTime - allTimes.sunriseTime)/ oneMinute)
     }
-    if (goSleepTime < sunsetTime) {
-      minutesOfSun += ((goSleepTime - endWorkTime) / oneMinute)
+    if (allTimes.goSleepTime < allTimes.sunsetTime) {
+      minutesOfSun += ((allTimes.goSleepTime - allTimes.endWorkTime) / oneMinute)
     }
-    else if (((endWorkTime < sunsetTime) && (sunsetTime < goSleepTime))) {
-      minutesOfSun += ((sunsetTime - endWorkTime) / oneMinute)
+    else if (((allTimes.endWorkTime < allTimes.sunsetTime) && (allTimes.sunsetTime < allTimes.goSleepTime))) {
+      minutesOfSun += ((allTimes.sunsetTime - allTimes.endWorkTime) / oneMinute)
     }
     if (dayToCalculate === this.state.standardDay) {
       this.setState({standardDay: {
@@ -199,6 +201,86 @@ class App extends React.Component<Props, State> {
       }})
     }
   }
+
+  // calculateSuntimeWeekend = (dayToCalculate: Day): void =>  {
+  //   let sunrise: Date = new Date (dayToCalculate.sunrise)
+  //   let sunset: Date = new Date (dayToCalculate.sunset)
+  //   sunrise.setHours(sunrise.getHours()-1)
+  //   sunset.setHours(sunset.getHours()-1)
+  //   const sunriseTime: number = sunrise.getTime()
+  //   const sunsetTime: number = sunset.getTime()
+  //   const year: number = sunrise.getFullYear()
+  //   const month: number = sunrise.getMonth()
+  //   const day: number = sunrise.getDate()
+  //   const wakeUpTime = new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)) -1 , (parseInt(this.state.wakeUp.slice(3,5))) -1).getTime()
+  //   const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)) - 1, (parseInt(this.state.goSleep.slice(3,5))) - 1).getTime()
+    
+  //   const oneMinute: number = 60000
+  //   let minutesOfSun = 0;
+    
+  //   if (wakeUpTime > sunriseTime && goSleepTime > sunsetTime) {
+  //     minutesOfSun += ((sunsetTime - wakeUpTime) / oneMinute)
+  //   } else if (wakeUpTime < sunriseTime && goSleepTime > sunsetTime) {
+  //     minutesOfSun += ((sunsetTime - wakeUpTime) / oneMinute)
+  //   } else if (wakeUpTime > sunriseTime && goSleepTime < sunsetTime) {
+  //     minutesOfSun += ((goSleepTime - wakeUpTime) / oneMinute)
+  //   } else if (wakeUpTime < sunriseTime && goSleepTime < sunsetTime) {
+  //     minutesOfSun += ((goSleepTime - sunriseTime) / oneMinute)
+  //   }
+    
+  //   if (dayToCalculate === this.state.standardDay) {
+  //     this.setState({standardDay: {
+  //       ...this.state.standardDay,
+  //       totalSun: minutesOfSun
+  //     }})
+  //   } else {
+  //     this.setState({dstDay: {
+  //       ...this.state.dstDay,
+  //       totalSun: minutesOfSun
+  //     }})
+  //   }
+  // }
+
+  // calculateSuntimeWeekday = (dayToCalculate: Day): void => {
+  //   const oneMinute: number = 60000
+  //   let sunrise: Date = new Date (dayToCalculate.sunrise)
+  //   let sunset: Date = new Date (dayToCalculate.sunset)
+  //   sunrise.setHours(sunrise.getHours()-1)
+  //   sunset.setHours(sunset.getHours()-1)
+  //   const sunriseTime: number = sunrise.getTime()
+  //   const sunsetTime: number = sunset.getTime()
+  //   const year: number = sunrise.getFullYear()
+  //   const month: number = sunrise.getMonth()
+  //   const day: number = sunrise.getDate()
+  //   let minutesOfSun = 0;
+  //   const wakeUpTime = new Date(year, month, day, parseInt(this.state.wakeUp.slice(0,2)), parseInt(this.state.wakeUp.slice(3,5))).getTime()
+  //   const startWorkTime = new Date(year, month, day, parseInt(this.state.startWork.slice(0,2)), parseInt(this.state.startWork.slice(3,5))).getTime()
+  //   const endWorkTime = new Date(year, month, parseInt(this.state.endWork.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.endWork.slice(0,2)), parseInt(this.state.endWork.slice(3,5))).getTime()
+  //   const goSleepTime = new Date(year, month, parseInt(this.state.goSleep.slice(0,2)) > 12 ? day: day +1, parseInt(this.state.goSleep.slice(0,2)), parseInt(this.state.goSleep.slice(3,5))).getTime()
+    
+  //   if (sunriseTime < wakeUpTime) {
+  //     minutesOfSun += ((startWorkTime - wakeUpTime) / oneMinute)
+  //   } else if ( sunriseTime < startWorkTime) {
+  //     minutesOfSun += ((startWorkTime - sunriseTime)/ oneMinute)
+  //   }
+  //   if (goSleepTime < sunsetTime) {
+  //     minutesOfSun += ((goSleepTime - endWorkTime) / oneMinute)
+  //   }
+  //   else if (((endWorkTime < sunsetTime) && (sunsetTime < goSleepTime))) {
+  //     minutesOfSun += ((sunsetTime - endWorkTime) / oneMinute)
+  //   }
+  //   if (dayToCalculate === this.state.standardDay) {
+  //     this.setState({standardDay: {
+  //       ...this.state.standardDay,
+  //       totalSun: minutesOfSun
+  //     }})
+  //   } else {
+  //     this.setState({dstDay: {
+  //       ...this.state.dstDay,
+  //       totalSun: minutesOfSun
+  //     }})
+  //   }
+  // }
 
   initiateFetch = () => {
     const dateForFetch = this.state.standardDay.date.toISOString().split('T')[0]
@@ -236,13 +318,13 @@ class App extends React.Component<Props, State> {
   render() {
     const showError = (this.state.error && <Error error={this.state.error}/>)
     return (
-      <div className="App">
+      <div className='App'>
         {showError}
         <Switch>
-          <Route exact path="/" render={() => <Form currentView={this.state.currentView} changeView={this.changeView} grabTime={this.grabTime} goSleep={this.state.goSleep} startWork={this.state.startWork} endWork={this.state.endWork} wakeUp={this.state.wakeUp} initiateFetch={this.initiateFetch} />} />
-          <Route path="/dst" render={() => <DSTBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
-          <Route path="/standard" render={() => <StandardTimeBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
-          <Route path="/*" render={() => <Error error="Sorry this page doesn't seem to exist!"/>}/>
+          <Route exact path='/' render={() => <Form currentView={this.state.currentView} changeView={this.changeView} grabTime={this.grabTime} goSleep={this.state.goSleep} startWork={this.state.startWork} endWork={this.state.endWork} wakeUp={this.state.wakeUp} initiateFetch={this.initiateFetch} />} />
+          <Route path='/dst' render={() => <DSTBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
+          <Route path='/standard' render={() => <StandardTimeBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
+          <Route path='/*' render={() => <Error error="Sorry this page doesn't seem to exist!"/>}/>
         </Switch>
       </div>
     );

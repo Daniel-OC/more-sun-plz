@@ -4,7 +4,7 @@ interface Props {
   error: string
 }
 
-const Error = (props: Props) => {
+const Error: React.FC<Props> = (props: Props) => {
   return (
     <section className='error-container'>
       <p className='error-message'>{props.error}</p>

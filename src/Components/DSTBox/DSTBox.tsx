@@ -1,6 +1,5 @@
 import {Link} from 'react-router-dom'
 
-// put this in types so it's accessible multiple places?
 interface Day {
   sunrise: string
   sunset: string
@@ -8,7 +7,6 @@ interface Day {
   day: number
   totalSun: number
 }
-
 
 interface Props {
   dstDay: Day
@@ -34,12 +32,12 @@ const DSTBox: React.FC<Props> = (props: Props) => {
     </section>
   
   return (
-    <section className="DST-box">
-      <Link to="/" className='home-button'>Go Home</Link>
-      {props.currentTimeDesignation === "DST" && yesDST}
-      {props.currentTimeDesignation === "Standard" && notDST}
-      {props.currentView === "dst" && <Link to="/standard" className='to-standard-button' onClick={() => props.changeView("standard")}><p>Compare to Standard Time</p></Link>}
-      {props.currentView === "standard" && <Link to="/dst" className='to-dst-button' onClick={() => props.changeView("dst")}><p>Compare to Daylight Savings Time</p></Link>}
+    <section className='DST-box'>
+      <Link to='/' className='home-button'>Go Home</Link>
+      {props.currentTimeDesignation === 'DST' && yesDST}
+      {props.currentTimeDesignation === 'Standard' && notDST}
+      {props.currentView === 'dst' && <Link to='/standard' className='to-standard-button' onClick={() => props.changeView('standard')}><p>Compare to Standard Time</p></Link>}
+      {props.currentView === 'standard' && <Link to='/dst' className='to-dst-button' onClick={() => props.changeView('dst')}><p>Compare to Daylight Savings Time</p></Link>}
     </section>
   )
 }
