@@ -4,7 +4,8 @@ import {getSunriseAndSunset} from './apiCall'
 import Form from './Components/Form/Form'
 import DSTBox from './Components/DSTBox/DSTBox'
 import StandardTimeBox from './Components/StandardTimeBox/StandardTimeBox'
-import { Route, Link } from 'react-router-dom'
+import { Route, Link, Switch } from 'react-router-dom'
+import Error from './Components/Error/Error'
 
 interface Props {}
 
@@ -17,6 +18,7 @@ interface State {
   dstDay: Day
   currentTimeDesignation: string
   currentView: string
+  error: string
 }
 
 interface Day {
@@ -62,7 +64,8 @@ class App extends React.Component<Props, State> {
       totalSun: 0
     },
     currentTimeDesignation: "",
-    currentView: ""
+    currentView: "",
+    error: ''
   }
 
   grabTime = (type: string, time: string) => {
@@ -207,7 +210,7 @@ class App extends React.Component<Props, State> {
       this.setStateWithFetch(data)
     })
     // .then(() => this.determineWdOrWe())
-    .catch(error => console.log(error))
+    .catch(error => this.setState({error: error}))
   }
 
   setStateWithFetch = (data: FetchResponse) => {
@@ -235,11 +238,17 @@ class App extends React.Component<Props, State> {
   }
 
   render() {
+
+    const showError = (this.state.error && <Error error={this.state.error}/>)
     return (
       <div className="App">
-        <Route exact path="/" render={() => <Form currentView={this.state.currentView} changeView={this.changeView} grabTime={this.grabTime} goSleep={this.state.goSleep} startWork={this.state.startWork} endWork={this.state.endWork} wakeUp={this.state.wakeUp} initiateFetch={this.initiateFetch} />} />
-        <Route path="/dst" render={() => <DSTBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
-        <Route path="/standard" render={() => <StandardTimeBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
+        {showError}
+        <Switch>
+          <Route exact path="/" render={() => <Form currentView={this.state.currentView} changeView={this.changeView} grabTime={this.grabTime} goSleep={this.state.goSleep} startWork={this.state.startWork} endWork={this.state.endWork} wakeUp={this.state.wakeUp} initiateFetch={this.initiateFetch} />} />
+          <Route path="/dst" render={() => <DSTBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
+          <Route path="/standard" render={() => <StandardTimeBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
+          <Route path="/*" render={() => <Error error="Sorry this page doesn't seem to exist!"/>}/>
+        </Switch>
       </div>
     );
   }
