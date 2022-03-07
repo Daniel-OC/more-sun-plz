@@ -117,8 +117,6 @@ class App extends React.Component<Props, State> {
     console.log('weekendCalc')
     let sunrise: Date = new Date (dayToCalculate.sunrise)
     let sunset: Date = new Date (dayToCalculate.sunset)
-    //Why are these next two lines necessary? Something about Javascript being a 0 indexed language? Very confused by sunset's tendency to increase it's hour by one.
-    //Seemingly not necessary anymore?! wtf?!
     sunrise.setHours(sunrise.getHours()-1)
     sunset.setHours(sunset.getHours()-1)
     const sunriseTime: number = sunrise.getTime()
@@ -165,7 +163,6 @@ class App extends React.Component<Props, State> {
     console.log(dayToCalculate.sunrise)
     let sunrise: Date = new Date (dayToCalculate.sunrise)
     let sunset: Date = new Date (dayToCalculate.sunset)
-    //Why are these next two lines necessary? Something about Javascript being a 0 indexed language? Very confused by sunset's tendency to increase it's hour by one.
     sunrise.setHours(sunrise.getHours()-1)
     sunset.setHours(sunset.getHours()-1)
     const sunriseTime: number = sunrise.getTime()
@@ -209,7 +206,6 @@ class App extends React.Component<Props, State> {
     .then((data: FetchResponse) => {
       this.setStateWithFetch(data)
     })
-    // .then(() => this.determineWdOrWe())
     .catch(error => this.setState({error: error}))
   }
 
@@ -238,7 +234,6 @@ class App extends React.Component<Props, State> {
   }
 
   render() {
-
     const showError = (this.state.error && <Error error={this.state.error}/>)
     return (
       <div className="App">
