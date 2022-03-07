@@ -210,7 +210,7 @@ class App extends React.Component<Props, State> {
       this.setStateWithFetch(data)
     })
     // .then(() => this.determineWdOrWe())
-    .catch(error => console.log(error))
+    .catch(error => this.setState({error: error}))
   }
 
   setStateWithFetch = (data: FetchResponse) => {
@@ -242,11 +242,12 @@ class App extends React.Component<Props, State> {
     const showError = (this.state.error && <Error error={this.state.error}/>)
     return (
       <div className="App">
+        {showError}
         <Switch>
           <Route exact path="/" render={() => <Form currentView={this.state.currentView} changeView={this.changeView} grabTime={this.grabTime} goSleep={this.state.goSleep} startWork={this.state.startWork} endWork={this.state.endWork} wakeUp={this.state.wakeUp} initiateFetch={this.initiateFetch} />} />
           <Route path="/dst" render={() => <DSTBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
           <Route path="/standard" render={() => <StandardTimeBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
-          <Route path="/*" render={() => <Error error="Sorry this page doesn't seem exist!"/>}/>
+          <Route path="/*" render={() => <Error error="Sorry this page doesn't seem to exist!"/>}/>
         </Switch>
       </div>
     );

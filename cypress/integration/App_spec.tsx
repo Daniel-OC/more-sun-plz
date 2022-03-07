@@ -52,8 +52,6 @@ describe('App User Flows', () => {
       .get('#go-sleep-id').should('have.value', '23:00:00')
       .get('#wake-up-id').type('07:00:00')
       .get('#start-work-id').type('09:00:00')
-      .get('#end-work-id').type('17:00:00')
-
-      
+      .get('#end-work-id').type('17:00:00')  
   })
 })
