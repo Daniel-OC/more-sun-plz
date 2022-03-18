@@ -15,4 +15,4 @@ jobs:
       # - name: Start Server
       #   run: npm start
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        run: test
