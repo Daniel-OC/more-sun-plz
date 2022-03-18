@@ -13,6 +13,6 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Start Server
-        run: node index.tsx
+        run: npm start
       - name: Cypress run
         uses: cypress-io/github-action@v2
