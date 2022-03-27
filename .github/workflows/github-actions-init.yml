@@ -15,4 +15,4 @@ jobs:
       # - name: Start Server
       #   run: npm start
       - name: Cypress run
-        run: test
+        run: npm test
