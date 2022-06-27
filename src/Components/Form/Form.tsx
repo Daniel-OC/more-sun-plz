@@ -48,11 +48,16 @@ const Form: React.FC<Props> = (props: Props) => {
 
   return(
     <section className='input-form'>
-      <h2>How Does Daylight Savings Affect Me?</h2>
-      {goSleep()}
-      {wakeUp()}
-      {startWork()}
-      {endWork()}
+      <div className='time-entries-box'>
+        <div className='left-form'>
+          {goSleep()}
+          {wakeUp()}
+        </div>
+        <div className='right-form'>
+          {startWork()}
+          {endWork()}
+        </div>
+      </div>
       {props.endWork && props.goSleep && props.startWork && props.wakeUp && <Link to='standard'>
           <button className='submit-hours'
           onClick={() => {

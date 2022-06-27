@@ -1,6 +1,58 @@
+
 .App {
   text-align: center;
+  background: url('./moreSunPlzBG.png');
+  background-repeat: no-repeat;
+  background-size:cover;
+  width: 100%;
+  height: 100vh;
+  margin: none;
+  overflow: hidden;
+  display: flex;
+};
+
+.input-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-around;
 }
+
+.time-entries-box {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-content: center;
+}
+
+.left-box {
+  width: 100%;
+  background: rgba(29, 38, 59, 0.84);
+};
+
+.right-box {
+  width: 100%
+};
+
+h1 {
+  color: #f2f2f2;
+  width:100%;
+  font-size: 5em;
+  font-family: 'Gentium Book Basic', serif;
+};
+
+/* Rectangle 2 */
+
+// position: absolute;
+// width: 757px;
+// height: 982px;
+// left: 757px;
+// top: 982px;
+
+// background: rgba(29, 38, 59, 0.84);
+// transform: rotate(-180deg);
+
+
 
 @media screen and (max-width: 40em) {
   * {
@@ -12,6 +64,8 @@
 @media screen and (min-width: 40em) {
   * {
     color: black;
-    background-color: white;
+    
   }
 }
+
+
