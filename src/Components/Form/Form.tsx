@@ -58,7 +58,7 @@ const Form: React.FC<Props> = (props: Props) => {
           {endWork()}
         </div>
       </div>
-      <div>
+      <div className='submit-container'>
         {props.endWork && props.goSleep && props.startWork && props.wakeUp && <Link to='standard'>
             <button className='submit-hours'
             onClick={() => {
