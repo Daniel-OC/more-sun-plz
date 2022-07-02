@@ -16,7 +16,7 @@ const Form: React.FC<Props> = (props: Props) => {
   
   const goSleep = () => {
     return <TimeInput
-    title='What time do you go to bed?'
+    title='I go to bed at:'
     class='go-sleep'
     grabTime={props.grabTime}
     />
@@ -24,7 +24,7 @@ const Form: React.FC<Props> = (props: Props) => {
   
   const wakeUp = () => {
     return <TimeInput 
-    title='What time do you wake up?'
+    title='I wake up at:'
     class='wake-up'
     grabTime={props.grabTime}
     />
@@ -32,7 +32,7 @@ const Form: React.FC<Props> = (props: Props) => {
 
   const startWork = () => {
     return <TimeInput 
-    title='What time do you start work?'
+    title='I start work at:'
     class='start-work'
     grabTime={props.grabTime}
     />
@@ -40,7 +40,7 @@ const Form: React.FC<Props> = (props: Props) => {
 
   const endWork = () => {
     return <TimeInput
-    title='What time does work end?'
+    title='I finish work at:'
     class='end-work'
     grabTime={props.grabTime}
     />
@@ -58,14 +58,16 @@ const Form: React.FC<Props> = (props: Props) => {
           {endWork()}
         </div>
       </div>
-      {props.endWork && props.goSleep && props.startWork && props.wakeUp && <Link to='standard'>
-          <button className='submit-hours'
-          onClick={() => {
-            props.initiateFetch()
-            props.changeView('standard')}} >
-            Submit
-          </button>
-        </Link>}
+      <div>
+        {props.endWork && props.goSleep && props.startWork && props.wakeUp && <Link to='standard'>
+            <button className='submit-hours'
+            onClick={() => {
+              props.initiateFetch()
+              props.changeView('standard')}} >
+              Submit
+            </button>
+          </Link>}
+      </div>
     </section>
   ) 
 }
