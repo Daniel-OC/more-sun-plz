@@ -1,10 +1,9 @@
 import React, { useState} from "react"
-import keys from "../../config.js"
 const LocationForm: React.FC = () => {
 
   const [userLocation, setUserLocation] = useState(" ")
-  const accessKeyId = keys.accessKeyId
-  const secretAccessKey = keys.secretAccessKey
+  const accessKeyId = process.env.REACT_APP_accessKeyId
+  const secretAccessKey = process.env.REACT_APP_secretAccessKey
 
   // longterm need to update the type!
   const handleChange = (event: any) => {
@@ -12,6 +11,7 @@ const LocationForm: React.FC = () => {
     setUserLocation(event.target.value)
 
   }
+
 
   const AWS = require('aws-sdk')
 
