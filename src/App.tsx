@@ -239,16 +239,21 @@ class App extends React.Component<Props, State> {
     const showError = (this.state.error && <Error error={this.state.error}/>)
     return (
       <div className='App'>
-        {showError}
-        <Switch>
-          <Route exact path='/' render={() => <Form currentView={this.state.currentView} changeView={this.changeView} grabTime={this.grabTime} goSleep={this.state.goSleep} startWork={this.state.startWork} endWork={this.state.endWork} wakeUp={this.state.wakeUp} initiateFetch={this.initiateFetch} />} />
-          <Route path='/dst' render={() => <DSTBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
-          <Route path='/standard' render={() => <StandardTimeBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
-          <Route path='/*' render={() => <Error error="Sorry this page doesn't seem to exist!"/>}/>
-        </Switch>
+        <div className='left-box'>
+          <h1>How Much More Sunlight Would You Get w/o Daylight Savings?</h1>
+        </div>
+        <div className='right-box'>
+          {showError}
+          <Switch>
+            <Route exact path='/' render={() => <Form currentView={this.state.currentView} changeView={this.changeView} grabTime={this.grabTime} goSleep={this.state.goSleep} startWork={this.state.startWork} endWork={this.state.endWork} wakeUp={this.state.wakeUp} initiateFetch={this.initiateFetch} />} />
+            <Route path='/dst' render={() => <DSTBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
+            <Route path='/standard' render={() => <StandardTimeBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
+            <Route path='/*' render={() => <Error error="Sorry this page doesn't seem to exist!"/>}/>
+          </Switch>
+        </div>
       </div>
     );
-  }
-}
+  };
+};
 
 export default App;
