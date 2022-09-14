@@ -6,6 +6,7 @@ import DSTBox from './Components/DSTBox/DSTBox'
 import StandardTimeBox from './Components/StandardTimeBox/StandardTimeBox'
 import { Route, Switch } from 'react-router-dom'
 import Error from './Components/Error/Error'
+import LocationForm from './Components/LocationForm/LocationForm';
 
 interface Props {}
 
@@ -245,7 +246,8 @@ class App extends React.Component<Props, State> {
         <div className='right-box'>
           {showError}
           <Switch>
-            <Route exact path='/' render={() => <Form currentView={this.state.currentView} changeView={this.changeView} grabTime={this.grabTime} goSleep={this.state.goSleep} startWork={this.state.startWork} endWork={this.state.endWork} wakeUp={this.state.wakeUp} initiateFetch={this.initiateFetch} />} />
+            <Route exact path='/' render={() => <LocationForm></LocationForm>}></Route>
+            {/* <Route exact path='/' render={() => <Form currentView={this.state.currentView} changeView={this.changeView} grabTime={this.grabTime} goSleep={this.state.goSleep} startWork={this.state.startWork} endWork={this.state.endWork} wakeUp={this.state.wakeUp} initiateFetch={this.initiateFetch} />} /> */}
             <Route path='/dst' render={() => <DSTBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
             <Route path='/standard' render={() => <StandardTimeBox currentView={this.state.currentView} changeView={this.changeView} dstDay={this.state.dstDay} standardDay={this.state.standardDay} currentTimeDesignation={this.state.currentTimeDesignation} />}/>
             <Route path='/*' render={() => <Error error="Sorry this page doesn't seem to exist!"/>}/>
