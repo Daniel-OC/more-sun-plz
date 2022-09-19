@@ -1,10 +1,17 @@
-import React, { useState} from "react"
+import React, { useState, useEffect} from "react"
 import debounce  from "lodash.debounce"
 const LocationForm: React.FC = () => {
 
-  const [userSearch, setuserSearch] = useState(" ")
+  const [userSearch, setUserSearch] = useState("")
   const accessKeyId = process.env.REACT_APP_accessKeyId
   const secretAccessKey = process.env.REACT_APP_secretAccessKey
+
+  useEffect(() => {
+    if(userSearch.length) {
+      console.log("hello")
+      search()
+    }
+  }, [userSearch])
 
 
   const AWS = require('aws-sdk')
@@ -24,29 +31,19 @@ const LocationForm: React.FC = () => {
   // longterm need to update the type!
   const handleChange = (event: any) => {
 
-    setuserSearch(event?.target?.value)
+    setUserSearch(event?.target?.value)
     console.log("handlechange")
     
   }
 
   const debounced = debounce(handleChange, 1000)
-
-
   
   
-  location.searchPlaceIndexForSuggestions(awsParameters, function(err: any, data: any) {
+  const search = () => {location.searchPlaceIndexForSuggestions(awsParameters, function(err: any, data: any) {
     console.log("aws")
     if (err) console.log("error",err, err.stack); // an error occurred
     else     console.log("data",data); })
- 
-    
-  
-  
- 
-    
-    // console.log(SearchPlaceIndexForSuggestions(parameters, function(err: any, data: any) {
-      //   if (err) console.log(err, err.stack); // an error occurred
-      //   else     console.log(data); }))
+  }
       
   return(
   <section>
