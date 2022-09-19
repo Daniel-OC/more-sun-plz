@@ -36,7 +36,7 @@ const LocationForm: React.FC = () => {
     
   }
 
-  const debounced = debounce(handleChange, 1000)
+  const debounced = debounce(handleChange, 1500)
   
   
   const search = () => {location.searchPlaceIndexForSuggestions(awsParameters, function(err: any, data: any) {
